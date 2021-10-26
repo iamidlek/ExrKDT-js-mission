@@ -12,6 +12,7 @@ formEl.addEventListener('submit', resultPage)
 
 async function resultPage (event) {
   event.preventDefault()
+  document.body.onscroll = ''
   const keyword = event.target[0].value
   if (!keyword) return
 
@@ -22,14 +23,13 @@ async function resultPage (event) {
   if (!data.maxPage || !data.list) {
     noMovieInfo()
   } else {
-    initPage ()
+    initPage()
     makeListItem(data.list)
-    window.addEventListener('scroll', touchEnd)
+    document.body.onscroll = touchEnd
   }
   spinner.classList.add('none')
   
   async function touchEnd () {
-    console.log('실행됨')
     if (window.scrollY + window.innerHeight > document.body.clientHeight - 100) {
       if (!getAdditional) {
         return
@@ -46,30 +46,6 @@ async function resultPage (event) {
     getAdditional = true
   }  
 }
-
-
-// 
-
-// const io = new IntersectionObserver(entries => {
-//   entries.forEach(entry => {
-//   	// 관찰 대상이 viewport 안에 들어온 경우 'tada' 클래스를 추가
-//     if (entry.intersectionRatio > 0) {
-//       entry.target.classList.add('tada');
-//     }
-//     // 그 외의 경우 'tada' 클래스 제거
-//     else {
-//       entry.target.classList.remove('tada');
-//     }
-//   })
-// })
-
-// // 관찰할 대상을 선언하고, 해당 속성을 관찰시킨다.
-// const boxElList = document.querySelectorAll('.box');
-// boxElList.forEach((el) => {
-//   io.observe(el);
-// })
-// 
-
 
 function initPage () {
   ulEl.querySelectorAll('li').forEach(li => li.remove())
