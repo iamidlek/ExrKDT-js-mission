@@ -5,10 +5,11 @@ const formEl = document.querySelector('form')
 
 const resultCT = document.querySelector('.result')
 const spinner = resultCT.querySelector('.spinner')
+const moveTop = resultCT.querySelector('.top')
 const ulEl = resultCT.querySelector('.list')
 
 formEl.addEventListener('submit', resultPage)
-
+moveTop.addEventListener('mousedown', goTop)
 
 async function resultPage (event) {
   event.preventDefault()
@@ -52,6 +53,7 @@ function initPage () {
   if (resultCT.querySelector('.nothing')){
     resultCT.querySelector('.nothing').remove()
   }
+  moveTop.classList.remove('none')
   resultCT.classList.remove('none')
   spinner.classList.remove('none')
   window.scrollTo({top:resultCT.offsetTop, behavior:'smooth'})
@@ -85,5 +87,12 @@ function noMovieInfo () {
   inputEl.value = ''
   inputEl.placeholder = '존재하지 않는 영화입니다'
   inputEl.classList.add('nonexistence')
+  resultCT.classList.add('none')
+  moveTop.classList.add('none')
   setTimeout(()=> {inputEl.classList.remove('nonexistence')},300)
+}
+
+function goTop () {
+  moveTop.classList.add('none')
+  window.scrollTo({top:0, behavior:'smooth'})
 }

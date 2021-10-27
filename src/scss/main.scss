@@ -70,7 +70,7 @@ body {
     margin-bottom: 0.3em;
   }
   form {
-    input[type="text"] {
+    input {
       text-align: center;
       border: none;
       outline: none;
@@ -84,7 +84,7 @@ body {
         animation: brr .2s infinite linear;
       }
     }
-    input[type="text"]::placeholder {
+    input::placeholder {
       color: rgba(#efefef, .7);
     }
     button {
@@ -137,6 +137,8 @@ body {
     border-radius: 15px;
     backdrop-filter: blur(10px);
     padding-top: 18px;
+    cursor: pointer;
+    transition: .4s;
     i{
       display: block;
       text-align: center;

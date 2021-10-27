@@ -39,7 +39,7 @@ module.exports = (env, options) => {
       })
     ],
     devServer: {
-      port: 8885,
+      port: 8080,
       open: true,
     }
   }
