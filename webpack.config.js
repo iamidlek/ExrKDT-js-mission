@@ -1,6 +1,7 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const DotenvWebpackPlugin = require('dotenv-webpack')
 
 module.exports = (env, options) => {
   return {
@@ -36,11 +37,12 @@ module.exports = (env, options) => {
         patterns: [
           { from: 'static' }
         ]
-      })
+      }),
+      new DotenvWebpackPlugin()
     ],
     devServer: {
-      port: 8080,
-      open: true,
+      port: 8050,
+      hot: true
     }
   }
 }
