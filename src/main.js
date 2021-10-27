@@ -1,15 +1,20 @@
+import axios from 'axios'
 import '~/scss/main.scss'
 
-const apiKey = '7035c60c'
 const formEl = document.querySelector('form')
+const home = document.querySelector('.home')
 
 const resultCT = document.querySelector('.result')
 const spinner = resultCT.querySelector('.spinner')
 const moveTop = resultCT.querySelector('.top')
 const ulEl = resultCT.querySelector('.list')
 
+const observer = new IntersectionObserver(handleTopBtn)
+observer.observe(resultCT)
+
 formEl.addEventListener('submit', resultPage)
 moveTop.addEventListener('mousedown', goTop)
+home.addEventListener('mouseenter', ()=> moveTop.classList.add('none'))
 
 async function resultPage (event) {
   event.preventDefault()
@@ -19,16 +24,18 @@ async function resultPage (event) {
 
   let page = 1
   let getAdditional = true
-  const data = await getData(apiKey, keyword, page)
+  const data = await getData(keyword, page)
   
   if (!data.maxPage || !data.list) {
     noMovieInfo()
   } else {
     initPage()
-    makeListItem(data.list)
-    document.body.onscroll = touchEnd
+    setTimeout(()=> {
+      makeListItem(data.list)
+      document.body.onscroll = touchEnd
+      spinner.classList.add('none')
+    },1000)
   }
-  spinner.classList.add('none')
   
   async function touchEnd () {
     if (window.scrollY + window.innerHeight > document.body.clientHeight - 100) {
@@ -37,7 +44,7 @@ async function resultPage (event) {
       } else {
         getAdditional = false
         page += 1
-        const data = await getData(apiKey, keyword, page)
+        const data = await getData(keyword, page)
         if(!data.maxPage || !data.list){
           return
         }
@@ -53,16 +60,18 @@ function initPage () {
   if (resultCT.querySelector('.nothing')){
     resultCT.querySelector('.nothing').remove()
   }
-  moveTop.classList.remove('none')
   resultCT.classList.remove('none')
   spinner.classList.remove('none')
   window.scrollTo({top:resultCT.offsetTop, behavior:'smooth'})
 }
 
-async function getData (apiKey, keyword, page) {
-  const url = `https://www.omdbapi.com?apikey=${apiKey}&s=${keyword}&page=${page}`
-  const chunk = await fetch(url).then(res => res.json())
-  return {maxPage : chunk.totalResults, list : chunk.Search}
+async function getData (keyword, page) {
+  const info = {
+    keyword,
+    page
+  }
+  const { data } = await axios.post('/.netlify/functions/list', info)
+  return { maxPage: data.totalResults, list: data.Search }
 }
 
 function makeListItem (list) {
@@ -70,7 +79,7 @@ function makeListItem (list) {
     const liEl = document.createElement('li')
     const imgEl = document.createElement('img')
     const strongEl = document.createElement('strong')
-    movie.Poster !== 'N/A' ? imgEl.src = movie.Poster : imgEl.src = 'https://via.placeholder.com/150/000000/FFFFFF/?text=NoImage'
+    movie.Poster !== 'N/A' ? imgEl.src = movie.Poster : imgEl.src = 'https://via.placeholder.com/160x218/000000/FFFFFF/?text=NoImage'
     imgEl.alt = movie.Title
     imgEl.title = movie.Title
     movie.Title.length > 19 
@@ -88,11 +97,18 @@ function noMovieInfo () {
   inputEl.placeholder = '존재하지 않는 영화입니다'
   inputEl.classList.add('nonexistence')
   resultCT.classList.add('none')
-  moveTop.classList.add('none')
   setTimeout(()=> {inputEl.classList.remove('nonexistence')},300)
 }
 
 function goTop () {
   moveTop.classList.add('none')
   window.scrollTo({top:0, behavior:'smooth'})
+}
+
+function handleTopBtn(entries) {
+  entries.forEach( entry => {
+    if (entry.isIntersecting) {
+      moveTop.classList.remove('none')
+    } 
+  })
 }
