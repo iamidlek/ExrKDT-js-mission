@@ -3,6 +3,7 @@ import '~/scss/main.scss'
 
 const formEl = document.querySelector('form')
 const home = document.querySelector('.home')
+const modalWindow = document.querySelector('.modal')
 
 const resultCT = document.querySelector('.result')
 const spinner = resultCT.querySelector('.spinner')
@@ -15,6 +16,7 @@ observer.observe(resultCT)
 formEl.addEventListener('submit', resultPage)
 moveTop.addEventListener('mousedown', goTop)
 home.addEventListener('mouseenter', ()=> moveTop.classList.add('none'))
+modalWindow.addEventListener('click', modalClose)
 
 async function resultPage (event) {
   event.preventDefault()
@@ -79,7 +81,12 @@ function makeListItem (list) {
     const liEl = document.createElement('li')
     const imgEl = document.createElement('img')
     const strongEl = document.createElement('strong')
-    movie.Poster !== 'N/A' ? imgEl.src = movie.Poster : imgEl.src = 'https://via.placeholder.com/160x218/000000/FFFFFF/?text=NoImage'
+    if (movie.Poster !== 'N/A') {
+      imgEl.src = movie.Poster
+      liEl.addEventListener('click', ()=>modal(movie.Title, movie.Poster))
+    } else {
+      imgEl.src = 'https://via.placeholder.com/160x218/000000/FFFFFF/?text=NoImage'
+    }
     imgEl.alt = movie.Title
     imgEl.title = movie.Title
     movie.Title.length > 19 
@@ -90,7 +97,21 @@ function makeListItem (list) {
     ulEl.append(liEl)
   })
 }
-
+function modal (title, poster) {
+  const bigImgEl = document.createElement('img')
+  const url = poster.replace('_V1_SX300','_V1_SX700')
+  bigImgEl.src = url
+  bigImgEl.alt = title
+  bigImgEl.title = title
+  modalWindow.append(bigImgEl)
+  document.body.style.overflow = 'hidden'
+  modalWindow.classList.remove('closed')
+}
+function modalClose () {
+  document.body.style.overflow = 'auto'
+  modalWindow.querySelector('img').remove()
+  modalWindow.classList.add('closed')
+}
 function noMovieInfo () {
   const inputEl = formEl.querySelector('input')
   inputEl.value = ''
