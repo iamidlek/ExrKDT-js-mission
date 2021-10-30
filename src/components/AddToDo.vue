@@ -25,7 +25,8 @@
 export default {
   methods: {
     save(e) {
-      console.log(e.target)
+      console.log(e.target[1].value)
+      console.log(e.target[1].name)
     }
   }
 }
