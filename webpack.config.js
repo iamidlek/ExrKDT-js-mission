@@ -1,12 +1,14 @@
 const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const DotenvWebpackPlugin = require('dotenv-webpack')
+const webpack = require('webpack')
+const HtmlPlugin = require('html-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
+const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = (env, options) => {
+  console.log(env, options)
   return {
     resolve: {
-      extensions: ['.js'],
+      extensions: ['.js', '.vue'],
       alias: {
         '~': path.resolve(__dirname, 'src')
       }
@@ -19,30 +21,44 @@ module.exports = (env, options) => {
     module: {
       rules: [
         {
+          test: /\.vue$/,
+          use: 'vue-loader'
+        },
+        {
+          test: /\.js$/,
+          exclude: /node_modules/,
+          use: 'babel-loader'
+        },
+        {
           test: /\.s?css$/,
           use: [
-            'style-loader',
+            'vue-style-loader',
             'css-loader',
             'postcss-loader',
-            'sass-loader',
-          ],
-        },
-      ],
+            'sass-loader'
+          ]
+        }
+      ]
     },
     plugins: [
-      new HtmlWebpackPlugin({
-        template: './src/index.html',
+      new HtmlPlugin({
+        template: './src/index.html'
       }),
-      new CopyWebpackPlugin({
+      new CopyPlugin({
         patterns: [
           { from: 'static' }
         ]
       }),
-      new DotenvWebpackPlugin()
+      new VueLoaderPlugin(),
+      new webpack.DefinePlugin({
+        __VUE_OPTIONS_API__: true,
+        __VUE_PROD_DEVTOOLS__: false,
+      }),
     ],
     devServer: {
       port: 8050,
-      hot: true
+      open: true,
+      hot: true,
     }
   }
 }
