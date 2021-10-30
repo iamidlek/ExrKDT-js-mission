@@ -1,19 +1,21 @@
 <template>
-  <div class="wrapper">
+  <div
+    class="wrapper">
     <h1>TooD</h1>
-    <form class="form">
-      <p>이름을 입력해 주세요</p>
+    <form
+      class="form"
+      @submit.prevent="recive">
+      <p>{{ info }}</p>
       <input
         v-model="userName"
         type="text"
         autocomplete="off"
-        placeholder="YooHyungChul"
-        onfocus="this.placeholder = ''"
-        onblur="this.placeholder = 'YooHyungChul'" />
+        :placeholder="placeHolder"
+        onfocus="placeholder = ''"
+        :onblur="`placeholder = '${placeHolder}'`" />
       <button
         type="submit"
-        class="enter"
-        @click.prevent="recive">
+        class="enter">
         Enter
       </button>
     </form>
@@ -22,14 +24,45 @@
 
 <script>
 export default {
+  props: {
+    modelValue: { 
+    type: Boolean
+    }
+  },
+  emits: ['enroll','update:modelValue'],
   data() {
     return {
-      userName: ''
+      userName: '',
+      info: '이름을 입력해 주세요',
+      placeHolder: 'YooHyungChul',
     }
+  },
+  mounted() {
+    const user = localStorage.getItem('todo')
+    if (user) {
+      this.placeHolder = user
+      this.info = `안녕하세요 ${user}님`
+    }
+  },
+  unmounted() {
+    setTimeout(()=>{
+      this.$emit('update:modelValue', true)
+      console.log('bye')
+      },1000)
   },
   methods: {
     recive() {
-      console.log(this.userName)
+      if (this.userName === '') return 
+      if (/\s/g.test(this.userName)){
+        this.placeHolder = '공백을 제거해 주세요'
+        this.userName = ''
+      } else if (!/[a-zA-Z]/g.test(this.userName)){
+        this.placeHolder = '영문 입력만 가능합니다'
+        this.userName = ''
+      } else {
+        localStorage.setItem('todo',this.userName)
+        this.$emit('enroll', true)
+      }
     }
   }
 }
@@ -51,6 +84,7 @@ export default {
     margin-bottom: 0.4em;
     text-shadow: 1px 5px 5px #1B0705;
     animation: updown 5s linear infinite;
+    user-select: none;
   }
   form {
     width: 250px;
@@ -64,7 +98,10 @@ export default {
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     border-left: 1px solid rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(0.8px);
+    user-select: none;
     p {
+      width: 90%;
+      text-align: center;
       padding-top: 1.8em;
       font-size: 1.1em;
     }
@@ -78,8 +115,8 @@ export default {
       font-size: 1.1em;
       line-height: 2em;
       background-color:rgba(#efefef, .9);
-      color: #efefef;
-      caret-color: rgba(#efefef, .5);
+      color: #0f0f0f;
+      caret-color: transparent;
       &::placeholder {
         color: rgba(#0f0f0f, .9);
       }
