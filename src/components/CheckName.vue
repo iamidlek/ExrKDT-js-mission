@@ -47,7 +47,6 @@ export default {
   unmounted() {
     setTimeout(()=>{
       this.$emit('update:modelValue', true)
-      console.log('bye')
       },1000)
   },
   methods: {
