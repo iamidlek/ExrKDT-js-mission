@@ -7,7 +7,9 @@
       v-model="open"
       :user="userName"
       @enroll="signIn" />
-    <ToDoView v-else-if="open" />
+    <ToDoView
+      v-else-if="open"
+      :user="userName" />
   </transition>
 </template> 
 
