@@ -16,7 +16,9 @@
         v-for="item in toDoList"
         :key="item.id"
         :item="item"
-        v-bind="$attrs" />
+        :user="user"
+        v-bind="$attrs"
+        @re-get-list="async () => await getTodo()" />
     </ul>
   </div>
   <div
@@ -64,6 +66,7 @@ export default {
   },
   methods: {
     async getTodo() {
+      console.log('실행')
       const {data} = await axios({
         url: 'https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos',
         method: 'get',
@@ -75,11 +78,7 @@ export default {
       })
       this.orderNum = data.length
       // done false true 여기서 처리해 줘야됨?
-      if (data.length){
-        this.toDoList = data
-      } else {
-        console.log('nodata')
-      }
+      this.toDoList = data
     },
     open() {
       this.addTF = true
@@ -168,6 +167,11 @@ export default {
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
     position: relative;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
     & > div {
       position: absolute;
       height: 10px;
