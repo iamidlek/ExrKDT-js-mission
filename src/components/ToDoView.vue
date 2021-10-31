@@ -3,6 +3,7 @@
     class="wrapper">
     <ToDoList
       class="todolist"
+      :user="user" 
       v-bind="$attrs" />
     <div>여기는 Done으로 전환할 버튼 추가 공간입니다</div>
   </div>
@@ -15,7 +16,15 @@ export default {
   components: {
     ToDoList
   },
-  // inheritAttrs:false
+  props: {
+    user: { 
+      type: String,
+      default: ''
+    },
+  },
+  // mounted() {
+  //   console.log(this.user)
+  // }
 }
 </script>
 
