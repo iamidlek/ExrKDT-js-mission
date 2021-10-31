@@ -3,18 +3,27 @@
     <i class="leaf">
       <h3><span>T</span>o Do List</h3>
     </i>
-    <div class="add">
+    <div
+      class="add"
+      @click="open">
       +
     </div>
     <!-- + 버튼 누르면 book 위에 선언된 블러처리 가능하면 해주기 -->
-    <AddToDo class="infobox" />
     <ul class="for list items">
-      <ListItem />
+      <ListItem v-bind="$attrs" />
     </ul>
+  </div>
+  <div
+    v-show="addTF"
+    class="focback">
+    <AddToDo
+      v-model="addTF"
+      class="infobox" />
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 import ListItem from '~/components/ListItem'
 import AddToDo from '~/components/AddToDo'
 
@@ -22,6 +31,36 @@ export default {
   components: {
     ListItem,
     AddToDo
+  },
+  data() {
+    return {
+      orderNum: 0,
+      addTF: false,
+      getreslist: []
+    }
+  },
+  mounted() {
+    (async () => {
+      await this.getTodo()
+      console.log(this.getreslist[0].id)
+    })()
+  },
+  methods: {
+    async getTodo() {
+      const {data} = await axios({
+        url: 'https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos',
+        method: 'get',
+        headers: {
+        'content-type': 'application/json',
+        'apikey': 'FcKdtJs202110',
+        'username': 'YooHyungChul'
+        }
+      })
+      this.getreslist = data
+    },
+    open() {
+      this.addTF = true
+    }
   }
 }
 </script>
@@ -41,12 +80,6 @@ export default {
   border-left: 1px solid rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(0.8px);
   user-select: none;
-  .infobox {
-    position: absolute;
-    width: 80%;
-    height: 50%;
-    top: 20%;
-  }
   .leaf {
     position: absolute;
     top: 32px;
@@ -112,5 +145,21 @@ export default {
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
   }
+}
+.infobox {
+  position: absolute;
+  width: 320px;
+  height: 256px;
+  top: 32%;
+}
+.focback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  backdrop-filter: blur(2px);
 }
 </style>
