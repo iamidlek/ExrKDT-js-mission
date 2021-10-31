@@ -9,6 +9,9 @@
       +
     </div>
     <ul class="list">
+      <div v-if="!toDoList.length">
+        ToDo를 추가하세요
+      </div>
       <ListItem
         v-for="item in toDoList"
         :key="item.id"
@@ -23,7 +26,9 @@
       v-model="addTF"
       v-bind="$attrs"
       :user="user"
-      class="infobox" />
+      :order="orderNum"
+      class="infobox"
+      @re-get-list="async () => await getTodo()" />
   </div>
 </template>
 
@@ -54,7 +59,7 @@ export default {
     (async () => {
       await this.getTodo()
       // console.log('추가 작업은 여기에')
-      console.log(this.toDoList)
+      // console.log(this.toDoList)
     })()
   },
   methods: {
@@ -68,12 +73,13 @@ export default {
         'username': `${this.user}`
         }
       })
-      // done false true 여기서 처리해 줘야됨
-      // if (data.length){
+      this.orderNum = data.length
+      // done false true 여기서 처리해 줘야됨?
+      if (data.length){
         this.toDoList = data
-      // } else {
-      //   console.log('nodata')
-      // }
+      } else {
+        console.log('nodata')
+      }
     },
     open() {
       this.addTF = true
@@ -161,6 +167,15 @@ export default {
     overflow: auto;
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    & > div {
+      position: absolute;
+      height: 10px;
+      width: 100%;
+      top: 40%;
+      text-align: center;
+      font-size: 1.3em;
+    }
   }
 }
 .infobox {
