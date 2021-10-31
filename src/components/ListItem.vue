@@ -1,14 +1,27 @@
 <template>
   <li class="todo">
-    <label :for="item.id">
-      <input
-        :id="item.id"
-        type="checkbox" />
-      <span>
-        <i></i>
-      </span>
-    </label>
-    <p class="title">
+    <transition name="icon">
+      <label
+        v-if="!change"
+        :for="item.id">
+        <input
+          :id="item.id"
+          type="checkbox" />
+        <span>
+          <i></i>
+        </span>
+      </label>
+      <div
+        v-else
+        class="del"
+        @click="del">
+        <div class="cross1"></div>
+        <div class="cross2"></div>
+      </div>
+    </transition>
+    <p
+      class="title"
+      @click="change = !change">
       {{ item.title.split('__@dateSet-expire__Info:')[0] }}
     </p>
     <p
@@ -20,11 +33,23 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   props: {
     item: {
       type: Object,
       default: () => ({})
+    },
+    user: {
+      type: String,
+      default: ''
+    },
+  },
+  emits: ['reGetList'],
+  data() {
+    return {
+      change: false
     }
   },
   computed: {
@@ -37,6 +62,24 @@ export default {
         return false
       }
     }
+  },
+  methods: {
+    async deleteTodo() {
+      await axios({
+      url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${this.item.id}`,
+      method: 'delete',
+      headers: {
+        'content-type': 'application/json',
+        'apikey': 'FcKdtJs202110',
+        'username': this.user
+        }
+      })
+      // console.log(data)
+    },
+    async del() {
+      await this.deleteTodo()
+      this.$emit('reGetList')
+    }
   }
 }
 </script>
@@ -47,7 +90,7 @@ export default {
   flex-direction: row;
   align-items: center;
   width: 100%;
-  height: 50px;
+  height: 54px;
   box-sizing: border-box;
   &:hover {
     .title {
@@ -60,6 +103,7 @@ export default {
     margin: 0;
     font-size: 1.1em;
     padding-bottom: 2px;
+    padding-left: 30px;
     line-height: 1.8;
     border-radius: 20px;
     transition: .6s ease-in-out;
@@ -73,10 +117,31 @@ export default {
     color: #d80808;
     }
   }
+  .del {
+    width: 28px;
+    height: 28px;
+    position: absolute;
+    cursor: pointer;
+    margin-right: 10px;
+    background: transparent;
+    cursor: pointer;
+    .cross1 {
+      width: 18px;
+      height: 18px;
+      border-right: 2px solid rgba(#efefef, .9);
+      transform: rotate(45deg) translateX(-2px);
+    }
+    .cross2 {
+      width: 18px;
+      height: 18px;
+      border-right: 2px solid rgba(#efefef, .9);
+      transform: rotate(-45deg) translateX(4px) translateY(-6px);
+    }
+  }
   label{
     width: 28px;
     height: 28px;
-    position: relative;
+    position: absolute;
     cursor: pointer;
     margin-right: 10px;
     input {
@@ -156,5 +221,16 @@ export default {
       }
     }
   }
+}
+.icon-enter-active{
+  opacity: 1;
+  transition: opacity .25s linear;
+}
+.icon-leave-active {
+  opacity: 0;
+  transition: opacity .25s linear;
+}
+.icon-enter-from{
+  opacity: 0;
 }
 </style>
