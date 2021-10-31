@@ -1,12 +1,12 @@
 <template>
-  <div
-    class="wrapper">
+  <div class="wrapper">
     <h1>TooD</h1>
     <form
       class="form"
       @submit.prevent="recive">
       <p>{{ info }}</p>
       <input
+        v-show="need"
         v-model="userName"
         type="text"
         autocomplete="off"
@@ -14,6 +14,7 @@
         onfocus="placeholder = ''"
         :onblur="`placeholder = '${placeHolder}'`" />
       <button
+        v-show="need"
         type="submit"
         class="enter">
         Enter
@@ -26,8 +27,12 @@
 export default {
   props: {
     modelValue: { 
-    type: Boolean
-    }
+      type: Boolean
+    },
+    // user: {
+    //   type: String,
+    //   default: ''
+    // }
   },
   emits: ['enroll','update:modelValue'],
   data() {
@@ -35,6 +40,7 @@ export default {
       userName: '',
       info: '이름을 입력해 주세요',
       placeHolder: 'YooHyungChul',
+      need: true,
     }
   },
   mounted() {
@@ -42,6 +48,7 @@ export default {
     if (user) {
       this.placeHolder = user
       this.info = `안녕하세요 ${user}님`
+      this.need = false
     }
   },
   unmounted() {
