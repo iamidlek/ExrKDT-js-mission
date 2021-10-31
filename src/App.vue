@@ -1,12 +1,14 @@
 <template>
   <BackGround />
-  <transition-group name="fade">
+  <transition
+    name="fade">
     <CheckName
       v-if="!admission"
       v-model="open"
+      :user="userName"
       @enroll="signIn" />
-    <ToDoView v-if="open" />
-  </transition-group>
+    <ToDoView v-else-if="open" />
+  </transition>
 </template> 
 
 <script>
