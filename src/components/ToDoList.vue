@@ -8,9 +8,12 @@
       @click="open">
       +
     </div>
-    <!-- + 버튼 누르면 book 위에 선언된 블러처리 가능하면 해주기 -->
-    <ul class="for list items">
-      <ListItem v-bind="$attrs" />
+    <ul class="list">
+      <ListItem
+        v-for="item in toDoList"
+        :key="item.id"
+        :item="item"
+        v-bind="$attrs" />
     </ul>
   </div>
   <div
@@ -18,6 +21,8 @@
     class="focback">
     <AddToDo
       v-model="addTF"
+      v-bind="$attrs"
+      :user="user"
       class="infobox" />
   </div>
 </template>
@@ -32,17 +37,24 @@ export default {
     ListItem,
     AddToDo
   },
+  props: {
+    user: { 
+      type: String,
+      default: ''
+    },
+  },
   data() {
     return {
       orderNum: 0,
       addTF: false,
-      getreslist: []
+      toDoList: []
     }
   },
-  mounted() {
+  beforeMount() {
     (async () => {
       await this.getTodo()
-      console.log(this.getreslist[0].id)
+      // console.log('추가 작업은 여기에')
+      console.log(this.toDoList)
     })()
   },
   methods: {
@@ -53,10 +65,15 @@ export default {
         headers: {
         'content-type': 'application/json',
         'apikey': 'FcKdtJs202110',
-        'username': 'YooHyungChul'
+        'username': `${this.user}`
         }
       })
-      this.getreslist = data
+      // done false true 여기서 처리해 줘야됨
+      // if (data.length){
+        this.toDoList = data
+      // } else {
+      //   console.log('nodata')
+      // }
     },
     open() {
       this.addTF = true
