@@ -34,14 +34,23 @@
 </template>
 
 <script>
-// const words = str.split('__@dateSet-expire__Info:');
+import axios from 'axios'
+
 export default {
   props: {
     modelValue: { 
       type: Boolean
     },
+    user: {
+      type: String,
+      default: ''
+    },
+    order: {
+      type: Number,
+      default: 0
+    }
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue','reGetList'],
   data() {
     return {
       placeHolder: 'Make To Do'
@@ -50,21 +59,40 @@ export default {
   computed: {
     today() {
       const date = new Date()
-      return date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()
+      const month = (date.getMonth()+1) >= 10 ? (date.getMonth()+1) : '0' + (date.getMonth()+1)
+      const day = date.getDate() >= 10 ? date.getDate() : '0' + date.getDate()
+      return date.getFullYear()+'-'+ month +'-'+ day
     }
   },
   methods: {
-    adding(e) {
+    async adding(e) {
       const { target } = e
       if (!target[0].value) {
         e.target[0].placeholder ='입력이 필요합니다'
         return
       }
-      const obj = { title:`${target[0].value}${target[1].name}${target[1].value}` }
-      console.log(obj)
+      const obj = { 
+        title:`${target[0].value}${target[1].name}${target[1].value}`,
+        order: this.order }
 
+      await this.createTodo(this.user, obj)
+      this.$emit('reGetList')
       this.$emit('update:modelValue',false)
       e.target[0].value = ''
+    },
+    async createTodo(user, item) {
+      // const { data } = await axios({
+      await axios({
+        url: 'https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos',
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'apikey': 'FcKdtJs202110',
+          'username': user
+        },
+        data: item
+      })
+      // return data
     }
   }
 }
