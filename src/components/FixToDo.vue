@@ -5,12 +5,13 @@
       class="t">Fix Title</label>
     <input
       id="fix-title"
+      ref="ftitle"
       type="text"
       name="title"
       autocomplete="off"
       :placeholder="placeHolder"
       onfocus="placeholder = ''"
-      :onblur="`prescheholder = '${oldTitle()}'`"
+      :onblur="`prescheholder = '${placeHolder}'`"
       maxlength="20"
       contenteditable="true" />
     <label for="resche">Reschedule</label>
@@ -26,7 +27,7 @@
     </button>
     <div
       class="close"
-      @click="$emit('update:modelValue',false)">
+      @click="closing">
       <div class="cross1"></div>
       <div class="cross2"></div>
     </div>
@@ -41,15 +42,19 @@ export default {
     modelValue: { 
       type: Boolean
     },
+    user: {
+      type: String,
+      default: ''
+    },
     data: {
       type: Object,
       default: () => ({})
     }
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue','refreshList'],
   data() {
     return {
-      placeHolder: this.oldTitle()
+      placeHolder: this.data.title.split('__@dateSet-expire__Info:')[0]
     }
   },
   computed: {
@@ -61,8 +66,38 @@ export default {
     },
   },
   methods: {
-    oldTitle() {
-      return this.data.title.split('__@dateSet-expire__Info:')[0]
+    async fixing(e) {
+      const { target } = e
+      if (!target[0].value) {
+        e.target[0].placeholder ='입력이 필요합니다'
+        return
+      }
+      const obj = { title:`${target[0].value}${target[1].name}${target[1].value}` }
+
+      await this.fixTodo(this.data.id,this.data.order, obj)
+      this.$emit('refreshList')
+      this.$emit('update:modelValue',false)
+      e.target[0].value = ''
+    },
+    async fixTodo(id, order, title) {
+      await axios({
+        url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
+        method: 'put',
+        headers: {
+          'content-type': 'application/json',
+          'apikey': 'FcKdtJs202110',
+          'username': this.user
+        },
+        data: {
+          ...title,
+          'done': false,
+          'order': order
+        }
+      })
+    },
+    closing () {
+      this.$refs.ftitle.value = ''
+      this.$emit('update:modelValue',false)
     }
   }
 }
