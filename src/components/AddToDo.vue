@@ -55,7 +55,6 @@ export default {
   data() {
     return {
       placeHolder: 'Make To Do',
-      inputBox: ''
     }
   },
   computed: {
