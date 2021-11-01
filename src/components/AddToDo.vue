@@ -5,6 +5,7 @@
       class="t">Title</label>
     <input
       id="title"
+      ref="title"
       type="text"
       name="title"
       autocomplete="off"
@@ -26,7 +27,7 @@
     </button>
     <div
       class="close"
-      @click="$emit('update:modelValue',false)">
+      @click="closing">
       <div class="cross1"></div>
       <div class="cross2"></div>
     </div>
@@ -53,7 +54,8 @@ export default {
   emits: ['update:modelValue','reGetList'],
   data() {
     return {
-      placeHolder: 'Make To Do'
+      placeHolder: 'Make To Do',
+      inputBox: ''
     }
   },
   computed: {
@@ -81,7 +83,6 @@ export default {
       e.target[0].value = ''
     },
     async createTodo(user, item) {
-      // const { data } = await axios({
       await axios({
         url: 'https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos',
         method: 'POST',
@@ -92,7 +93,10 @@ export default {
         },
         data: item
       })
-      // return data
+    },
+    closing () {
+      this.$refs.title.value = ''
+      this.$emit('update:modelValue',false)
     }
   }
 }
