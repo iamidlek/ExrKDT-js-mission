@@ -24,7 +24,9 @@
           :key="element.id"
           :item="element"
           :user="user"
+          :donelen="doneLen"
           @re-get-list="async () => await getTodo()"
+          @move-to-done="async () => await getTodo()"
           @fix-info="sendToModal"
         />
       </template>
@@ -90,13 +92,12 @@ export default {
       toModalData: {},
       toDoList: [],
       doneList: [],
+      doneLen: 0,
     };
   },
   beforeMount() {
     (async () => {
       await this.getTodo();
-      // console.log('추가 작업은 여기에')
-      // console.log(this.toDoList)
     })();
   },
   methods: {
@@ -110,7 +111,6 @@ export default {
           username: `${this.user}`,
         },
       });
-      // done false true 여기서 처리해 줘야됨?
       const tempList = [];
       const tempDone = [];
       data.forEach((item) => {
@@ -122,6 +122,7 @@ export default {
       });
       this.orderNum = tempList.length;
       this.toDoList = tempList;
+      this.doneLen = tempDone.length;
       this.doneList = tempDone;
     },
     open() {
@@ -144,9 +145,9 @@ export default {
       });
     },
     dropList() {
-      this.drag = false;
       const idList = this.toDoList.map((item) => item.id).reverse();
       this.arrangeTodo(idList);
+      this.drag = false;
     },
   },
 };
