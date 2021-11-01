@@ -1,8 +1,6 @@
 <template>
   <form @submit.prevent="fixing">
-    <label
-      for="fix-title"
-      class="t">Fix Title</label>
+    <label for="fix-title" class="t">Fix Title</label>
     <input
       id="fix-title"
       ref="ftitle"
@@ -13,21 +11,18 @@
       onfocus="placeholder = ''"
       :onblur="`prescheholder = '${placeHolder}'`"
       maxlength="20"
-      contenteditable="true" />
+      contenteditable="true"
+    />
     <label for="resche">Reschedule</label>
     <input
       id="resche"
       type="date"
       :value="today"
-      name="__@dateSet-expire__Info:" />
-    <button
-      type="submit"
-      class="fix">
-      F i x
-    </button>
-    <div
-      class="close"
-      @click="closing">
+      name="__@dateSet-expire__Info:"
+    />
+    <button type="submit" class="fix">F i x</button>
+    <p class="modi-info">{{ recentModify }}</p>
+    <div class="close" @click="closing">
       <div class="cross1"></div>
       <div class="cross2"></div>
     </div>
@@ -35,81 +30,97 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
 
 export default {
   props: {
-    modelValue: { 
-      type: Boolean
+    modelValue: {
+      type: Boolean,
     },
     user: {
       type: String,
-      default: ''
+      default: "",
     },
     data: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
-  emits: ['update:modelValue','refreshList'],
+  emits: ["update:modelValue", "refreshList"],
   data() {
     return {
-      placeHolder: this.data.title.split('__@dateSet-expire__Info:')[0]
-    }
+      placeHolder: this.data.title.split("__@dateSet-expire__Info:")[0],
+    };
   },
   computed: {
     today() {
-      const date = new Date()
-      const month = (date.getMonth()+1) >= 10 ? (date.getMonth()+1) : '0' + (date.getMonth()+1)
-      const day = date.getDate() >= 10 ? date.getDate() : '0' + date.getDate()
-      return date.getFullYear()+'-'+ month +'-'+ day
+      const date = new Date();
+      const month =
+        date.getMonth() + 1 >= 10
+          ? date.getMonth() + 1
+          : "0" + (date.getMonth() + 1);
+      const day = date.getDate() >= 10 ? date.getDate() : "0" + date.getDate();
+      return date.getFullYear() + "-" + month + "-" + day;
+    },
+    recentModify() {
+      const updatted = this.data.modiDate;
+      return "최신 갱신일 : " + updatted.replace("T", " ").substr(0, 16);
     },
   },
   methods: {
     async fixing(e) {
-      const { target } = e
+      const { target } = e;
       if (!target[0].value) {
-        e.target[0].placeholder ='입력이 필요합니다'
-        return
+        e.target[0].placeholder = "입력이 필요합니다";
+        return;
       }
-      const obj = { title:`${target[0].value}${target[1].name}${target[1].value}` }
+      const obj = {
+        title: `${target[0].value}${target[1].name}${target[1].value}`,
+      };
 
-      await this.fixTodo(this.data.id,this.data.order, obj)
-      this.$emit('refreshList')
-      this.$emit('update:modelValue',false)
-      e.target[0].value = ''
+      await this.fixTodo(this.data.id, this.data.order, obj);
+      this.$emit("refreshList");
+      this.$emit("update:modelValue", false);
+      e.target[0].value = "";
     },
     async fixTodo(id, order, title) {
       await axios({
         url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
-        method: 'put',
+        method: "put",
         headers: {
-          'content-type': 'application/json',
-          'apikey': 'FcKdtJs202110',
-          'username': this.user
+          "content-type": "application/json",
+          apikey: "FcKdtJs202110",
+          username: this.user,
         },
         data: {
           ...title,
-          'done': false,
-          'order': order
-        }
-      })
+          done: false,
+          order: order,
+        },
+      });
     },
-    closing () {
-      this.$refs.ftitle.value = ''
-      this.$emit('update:modelValue',false)
-    }
-  }
-}
+    closing() {
+      this.$refs.ftitle.value = "";
+      this.$emit("update:modelValue", false);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
 form {
   height: 50%;
-  background-image: linear-gradient(to left bottom, #af43f1, #af43f1, #aa6eed, #ac8de3, #c0c0c0);
+  background-image: linear-gradient(
+    to left bottom,
+    #af43f1,
+    #af43f1,
+    #aa6eed,
+    #ac8de3,
+    #c0c0c0
+  );
   border-radius: 20px;
   opacity: 0.92;
-  box-shadow: 20px 20px 50px rgba(0,0,0,0.5);
+  box-shadow: 20px 20px 50px rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   padding-left: 1.7em;
   padding-top: 1.4em;
@@ -131,10 +142,10 @@ form {
       padding-left: 10px;
       font-size: 1.5em;
       border-radius: 15px;
-      background: rgba(240,250,240,0.5);
+      background: rgba(240, 250, 240, 0.5);
       color: #af43f1;
       &:focus {
-        background: rgba(240,250,240,0.3)
+        background: rgba(240, 250, 240, 0.3);
       }
       &::placeholder {
         color: #aa6eed99;
@@ -153,10 +164,16 @@ form {
     font-size: 1.1em;
     line-height: 2em;
     background-color: transparent;
-    color: rgba(#efefef, .9);
+    color: rgba(#efefef, 0.9);
     box-sizing: border-box;
-    border: 2px solid rgba(#efefef, .9);
+    border: 2px solid rgba(#efefef, 0.9);
     cursor: pointer;
+  }
+  .modi-info {
+    position: absolute;
+    width: 100%;
+    bottom: -12px;
+    left: 3.3em;
   }
   .close {
     position: absolute;
@@ -169,13 +186,13 @@ form {
     .cross1 {
       width: 18px;
       height: 18px;
-      border-right: 2px solid rgba(#efefef, .9);
+      border-right: 2px solid rgba(#efefef, 0.9);
       transform: rotate(45deg) translateX(-10px);
     }
     .cross2 {
       width: 18px;
       height: 18px;
-      border-right: 2px solid rgba(#efefef, .9);
+      border-right: 2px solid rgba(#efefef, 0.9);
       transform: rotate(-45deg) translateX(4px) translateY(-14px);
     }
   }
