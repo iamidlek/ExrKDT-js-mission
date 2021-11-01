@@ -19,16 +19,25 @@
         <div class="cross2"></div>
       </div>
     </transition>
-    <p
+    <div
       class="title"
       @click="change = !change">
-      {{ item.title.split('__@dateSet-expire__Info:')[0] }}
-    </p>
-    <p
-      class="due"
-      :class="{expire : calcDate}">
-      {{ item.title.split('__@dateSet-expire__Info:')[1].slice(-5) }}
-    </p>
+      <div>{{ item.title.split('__@dateSet-expire__Info:')[0] }}</div>
+    </div>
+    <transition name="icon">
+      <p
+        v-if="!change"
+        class="due"
+        :class="{expire : calcDate}">
+        {{ item.title.split('__@dateSet-expire__Info:')[1].slice(-5) }}
+      </p>
+      <div
+        v-else
+        class="fix"
+        @click="upCurrLiData">
+        <span></span>
+      </div>
+    </transition>
   </li>
 </template>
 
@@ -46,10 +55,10 @@ export default {
       default: ''
     },
   },
-  emits: ['reGetList'],
+  emits: ['reGetList','fixInfo'],
   data() {
     return {
-      change: false
+      change: false,
     }
   },
   computed: {
@@ -79,6 +88,13 @@ export default {
     async del() {
       await this.deleteTodo()
       this.$emit('reGetList')
+    },
+    upCurrLiData() {
+      const liData = {
+        order: this.item.order,
+        title: this.item.title
+      }
+      this.$emit('fixInfo', liData)
     }
   }
 }
@@ -92,6 +108,7 @@ export default {
   width: 100%;
   height: 54px;
   box-sizing: border-box;
+  position: relative;
   &:hover {
     .title {
       background: rgba(255, 255, 255, 0.2);
@@ -102,19 +119,68 @@ export default {
     text-align: center;
     margin: 0;
     font-size: 1.1em;
-    padding-bottom: 2px;
-    padding-left: 30px;
-    line-height: 1.8;
+    padding-left: 32px;
     border-radius: 20px;
     transition: .6s ease-in-out;
     cursor: pointer;
+    & > div {
+      width: 157px;
+      line-height: 1.8;
+      white-space: nowrap;
+      overflow: hidden;
+    }
   }
   .due {
+    position: absolute;
+    right: 2px;
+    bottom: 0;
     font-size: 1.1em;
-    padding-left: 10px;
     pointer-events: none;
     &.expire {
     color: #d80808;
+    }
+  }
+  .fix {
+    position: absolute;
+    right: 14px;
+    top: 32%;
+    font-size: 1.1em;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    &::before {
+      content: '';
+      position: absolute;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+      border-left: 2px solid rgba(255, 255, 255, 0.4);
+      background: linear-gradient(45deg, rgba(255, 255, 255, 0.4) 50%, transparent 50%, transparent 100%);
+      width: 3px;
+      height: 3px;
+      top: 4px;
+      right: 3px;
+    }
+    &::after {
+      content: '';
+      position: absolute;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-left-color: transparent;
+      width: 10px;
+      height: 2px;
+      top: -2px;
+      right: -7px;
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(-42deg);
+    }
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.7);
+      &::before {
+        border-color: rgba(255, 255, 255, 0.7);
+      }
+      &::after {
+        border-color: rgba(255, 255, 255, 0.7);
+      }
     }
   }
   .del {
@@ -128,14 +194,19 @@ export default {
     .cross1 {
       width: 18px;
       height: 18px;
-      border-right: 2px solid rgba(#efefef, .9);
+      border-right: 2px solid rgba(#efefef, .5);
       transform: rotate(45deg) translateX(-2px);
     }
     .cross2 {
       width: 18px;
       height: 18px;
-      border-right: 2px solid rgba(#efefef, .9);
+      border-right: 2px solid rgba(#efefef, .5);
       transform: rotate(-45deg) translateX(4px) translateY(-6px);
+    }
+    &:hover {
+      .cross1, .cross2 {
+        border-color: rgba(#efefef, .9);
+      }
     }
   }
   label{
@@ -184,7 +255,7 @@ export default {
         &::before {
           content: '';
           position: absolute;
-          top: 22px;
+          top: 24px;
           left: 12px;
           width: 5px;
           height: 5px;
@@ -196,7 +267,7 @@ export default {
         &::after{
           content: '';
           position: absolute;
-          bottom: 18px;
+          bottom: 16px;
           left: calc(50% - 15px);
           width: 14px;
           height: 2px;
