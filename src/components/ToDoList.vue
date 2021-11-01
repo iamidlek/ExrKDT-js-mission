@@ -102,7 +102,8 @@ export default {
     })();
   },
   beforeUnmount() {
-    this.$emit("upcompo", this.doneList);
+    const data = { list: this.doneList, len: this.doneList.length };
+    this.$emit("upcompo", data);
   },
   methods: {
     async getTodo() {
