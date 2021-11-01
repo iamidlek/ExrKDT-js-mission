@@ -5,7 +5,12 @@
         <ToDoList :user="user" @upcompo="recive" v-bind="$attrs" />
       </div>
       <div class="todo" v-else>
-        <DoneList :user="user" :data="doneItems" v-bind="$attrs" />
+        <DoneList
+          :user="user"
+          :data="doneItems"
+          :len="doneLen"
+          v-bind="$attrs"
+        />
       </div>
     </transition>
     <div class="overturn">
@@ -37,6 +42,7 @@ export default {
       fb: true,
       content: "Done",
       doneItems: [],
+      doneLen: 0,
     };
   },
   methods: {
@@ -48,8 +54,9 @@ export default {
       }
       this.fb = !this.fb;
     },
-    recive(doneList) {
-      this.doneItems = doneList;
+    recive(data) {
+      this.doneItems = data.list;
+      this.doneLen = data.len;
     },
   },
 };
