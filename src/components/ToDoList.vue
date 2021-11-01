@@ -3,117 +3,153 @@
     <i class="leaf">
       <h3><span>T</span>o Do List</h3>
     </i>
-    <div
-      class="add"
-      @click="open">
-      +
-    </div>
-    <ul class="list">
-      <div v-if="!toDoList.length">
-        ToDo를 추가하세요
-      </div>
-      <ListItem
-        v-for="item in toDoList"
-        :key="item.id"
-        :item="item"
-        :user="user"
-        v-bind="$attrs"
-        @re-get-list="async () => await getTodo()"
-        @fix-info="sendToModal" />
-    </ul>
+    <div class="add" @click="open">+</div>
+    <div v-if="!toDoList.length" class="nolist">ToDo를 추가하세요</div>
+    <draggable
+      class="list"
+      tag="transition-group"
+      :component-data="{
+        tag: 'ul',
+        type: 'transition-group',
+        name: !drag ? 'flip-list' : null,
+      }"
+      v-model="toDoList"
+      v-bind="dragOptions"
+      @start="drag = true"
+      @end="dropList"
+      item-key="id"
+    >
+      <template #item="{ element }">
+        <ListItem
+          :key="element.id"
+          :item="element"
+          :user="user"
+          @re-get-list="async () => await getTodo()"
+          @fix-info="sendToModal"
+        />
+      </template>
+    </draggable>
   </div>
-  <div
-    v-show="addTF"
-    class="focback">
+  <div v-show="addTF" class="focback">
     <AddToDo
       v-model="addTF"
       v-bind="$attrs"
       :user="user"
       :order="orderNum"
       class="infobox"
-      @re-get-list="async () => await getTodo()" />
+      @re-get-list="async () => await getTodo()"
+    />
   </div>
-  <div
-    v-if="modiModal"
-    class="modify">
-    <FixToDo 
+  <div v-if="modiModal" class="modify">
+    <FixToDo
       v-model="modiModal"
       class="infobox"
       :data="toModalData"
       :user="user"
-      @refresh-list="async () => await getTodo()" />
+      @refresh-list="async () => await getTodo()"
+    />
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-import ListItem from '~/components/ListItem'
-import AddToDo from '~/components/AddToDo'
-import FixToDo from '~/components/FixToDo'
+import axios from "axios";
+import draggable from "vuedraggable";
+import ListItem from "~/components/ListItem";
+import AddToDo from "~/components/AddToDo";
+import FixToDo from "~/components/FixToDo";
 
 export default {
   components: {
+    draggable,
     ListItem,
     AddToDo,
-    FixToDo
+    FixToDo,
   },
   props: {
-    user: { 
+    user: {
       type: String,
-      default: ''
+      default: "",
+    },
+  },
+  computed: {
+    dragOptions() {
+      return {
+        animation: 200,
+        group: "description",
+        disabled: false,
+        ghostClass: "ghost",
+      };
     },
   },
   data() {
     return {
+      drag: false,
       orderNum: 0,
       addTF: false,
       modiModal: false,
       toModalData: {},
       toDoList: [],
       doneList: [],
-    }
+    };
   },
   beforeMount() {
     (async () => {
-      await this.getTodo()
+      await this.getTodo();
       // console.log('추가 작업은 여기에')
       // console.log(this.toDoList)
-    })()
+    })();
   },
   methods: {
     async getTodo() {
-      const {data} = await axios({
-        url: 'https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos',
-        method: 'get',
+      const { data } = await axios({
+        url: "https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos",
+        method: "get",
         headers: {
-        'content-type': 'application/json',
-        'apikey': 'FcKdtJs202110',
-        'username': `${this.user}`
-        }
-      })
+          "content-type": "application/json",
+          apikey: "FcKdtJs202110",
+          username: `${this.user}`,
+        },
+      });
       // done false true 여기서 처리해 줘야됨?
-      const tempList = []
-      const tempDone = []
-      data.forEach( item => {
+      const tempList = [];
+      const tempDone = [];
+      data.forEach((item) => {
         if (item.done === false) {
-          tempList.unshift(item)
+          tempList.unshift(item);
         } else {
-          tempDone.push(item)
+          tempDone.push(item);
         }
-      })
-      this.orderNum = tempList.length
-      this.toDoList = tempList
-      this.doneList = tempDone
+      });
+      this.orderNum = tempList.length;
+      this.toDoList = tempList;
+      this.doneList = tempDone;
     },
     open() {
-      this.addTF = true
+      this.addTF = true;
     },
     sendToModal(data) {
-      this.toModalData = data
-      this.modiModal = true
-    }
-  }
-}
+      this.toModalData = data;
+      this.modiModal = true;
+    },
+    async arrangeTodo(idArray) {
+      const { data } = await axios({
+        url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/reorder`,
+        method: "put",
+        headers: {
+          "content-type": "application/json",
+          apikey: "FcKdtJs202110",
+          username: this.user,
+        },
+        data: { todoIds: idArray },
+      });
+    },
+    dropList() {
+      this.drag = false;
+      const idList = this.toDoList.map((item) => item.id).reverse();
+      this.arrangeTodo(idList);
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -124,9 +160,9 @@ export default {
   flex-direction: column;
   align-items: center;
   position: relative;
-  box-shadow: 20px 20px 50px rgba(0,0,0,0.7);
+  box-shadow: 20px 20px 50px rgba(0, 0, 0, 0.7);
   border-radius: 20px;
-  background: rgba(240,250,240,0.1);
+  background: rgba(240, 250, 240, 0.1);
   border-top: 1px solid rgba(255, 255, 255, 0.5);
   border-left: 1px solid rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(0.8px);
@@ -137,10 +173,14 @@ export default {
     left: -16px;
     width: 280px;
     height: 46px;
-    background: linear-gradient(to right,#af43f1 50%, rgba(255, 255, 255, 0.5));
+    background: linear-gradient(
+      to right,
+      #af43f1 50%,
+      rgba(255, 255, 255, 0.5)
+    );
     border-radius: 20px;
     &::before {
-      content: '';
+      content: "";
       position: absolute;
       top: 46px;
       width: 15px;
@@ -151,7 +191,7 @@ export default {
       z-index: 2;
     }
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       top: 20px;
       width: 15px;
@@ -201,14 +241,14 @@ export default {
     &::-webkit-scrollbar {
       display: none;
     }
-    & > div {
-      position: absolute;
-      height: 10px;
-      width: 100%;
-      top: 40%;
-      text-align: center;
-      font-size: 1.3em;
-    }
+  }
+  .nolist {
+    position: absolute;
+    height: 10px;
+    width: 100%;
+    top: 50%;
+    text-align: center;
+    font-size: 1.3em;
   }
 }
 .focback {
@@ -236,5 +276,25 @@ export default {
   width: 320px;
   height: 256px;
   top: 32%;
+}
+
+.flip-list-move {
+  transition: transform 0.5s;
+}
+.no-move {
+  transition: transform 0s;
+}
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
+}
+.list-group {
+  min-height: 20px;
+}
+.list-group-item {
+  cursor: move;
+}
+.list-group-item i {
+  cursor: pointer;
 }
 </style>
