@@ -18,7 +18,8 @@
         :item="item"
         :user="user"
         v-bind="$attrs"
-        @re-get-list="async () => await getTodo()" />
+        @re-get-list="async () => await getTodo()"
+        @fix-info="sendToModal" />
     </ul>
   </div>
   <div
@@ -32,17 +33,28 @@
       class="infobox"
       @re-get-list="async () => await getTodo()" />
   </div>
+  <div
+    v-show="modiModal"
+    class="modify">
+    <FixToDo 
+      v-model="modiModal"
+      class="infobox"
+      :data="toModalData"
+      :user="user" />
+  </div>
 </template>
 
 <script>
 import axios from 'axios'
 import ListItem from '~/components/ListItem'
 import AddToDo from '~/components/AddToDo'
+import FixToDo from '~/components/FixToDo'
 
 export default {
   components: {
     ListItem,
-    AddToDo
+    AddToDo,
+    FixToDo
   },
   props: {
     user: { 
@@ -54,7 +66,9 @@ export default {
     return {
       orderNum: 0,
       addTF: false,
-      toDoList: []
+      modiModal: false,
+      toModalData: {},
+      toDoList: [],
     }
   },
   beforeMount() {
@@ -66,7 +80,6 @@ export default {
   },
   methods: {
     async getTodo() {
-      console.log('실행')
       const {data} = await axios({
         url: 'https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos',
         method: 'get',
@@ -82,6 +95,10 @@ export default {
     },
     open() {
       this.addTF = true
+    },
+    sendToModal(data) {
+      this.toModalData = data
+      this.modiModal = true
     }
   }
 }
@@ -182,12 +199,6 @@ export default {
     }
   }
 }
-.infobox {
-  position: absolute;
-  width: 320px;
-  height: 256px;
-  top: 32%;
-}
 .focback {
   position: absolute;
   top: 0;
@@ -197,5 +208,21 @@ export default {
   display: flex;
   justify-content: center;
   backdrop-filter: blur(2px);
+}
+.modify {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.infobox {
+  position: absolute;
+  width: 320px;
+  height: 256px;
+  top: 32%;
 }
 </style>
