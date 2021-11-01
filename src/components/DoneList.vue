@@ -4,8 +4,13 @@
       <h3><span>D</span>one List</h3>
     </i>
     <div class="removall"><div></div></div>
-    <div class="nolist">계획을 실행하세요 !</div>
-    <ul class="list"></ul>
+    <div class="nolist" v-if="this.len">계획을 실행하세요 !</div>
+    <ul class="list" v-else>
+      <li v-for="item in data" :key="item.id">
+        <span>{{ item.title }}</span>
+        <span>{{ item.updatedAt }}</span>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -13,9 +18,17 @@
 export default {
   props: {
     data: {
-      type: Array,
+      type: Object,
       default: [],
     },
+    len: {
+      type: Number,
+      default: 0,
+    },
+  },
+  beforeMount() {
+    console.log(this.data);
+    console.log(this.len);
   },
 };
 </script>
