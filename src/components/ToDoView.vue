@@ -6,15 +6,18 @@
       :user="user" 
       v-bind="$attrs" />
     <div>여기는 Done으로 전환할 버튼 추가 공간입니다</div>
+    <!-- <DragTest/> -->
   </div>
 </template>
 
 <script>
 import ToDoList from '~/components/ToDoList'
+// import DragTest from '~/components/DragTest'
 
 export default {
   components: {
-    ToDoList
+    ToDoList,
+    // DragTest
   },
   props: {
     user: { 
