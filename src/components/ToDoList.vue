@@ -34,13 +34,14 @@
       @re-get-list="async () => await getTodo()" />
   </div>
   <div
-    v-show="modiModal"
+    v-if="modiModal"
     class="modify">
     <FixToDo 
       v-model="modiModal"
       class="infobox"
       :data="toModalData"
-      :user="user" />
+      :user="user"
+      @refresh-list="async () => await getTodo()" />
   </div>
 </template>
 
@@ -69,6 +70,7 @@ export default {
       modiModal: false,
       toModalData: {},
       toDoList: [],
+      doneList: [],
     }
   },
   beforeMount() {
@@ -89,9 +91,19 @@ export default {
         'username': `${this.user}`
         }
       })
-      this.orderNum = data.length
       // done false true 여기서 처리해 줘야됨?
-      this.toDoList = data
+      const tempList = []
+      const tempDone = []
+      data.forEach( item => {
+        if (item.done === false) {
+          tempList.unshift(item)
+        } else {
+          tempDone.push(item)
+        }
+      })
+      this.orderNum = tempList.length
+      this.toDoList = tempList
+      this.doneList = tempDone
     },
     open() {
       this.addTF = true
