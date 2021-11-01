@@ -129,12 +129,6 @@ export default {
   height: 54px;
   box-sizing: border-box;
   position: relative;
-  &:hover {
-    .title > div {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 14px;
-    }
-  }
   .title {
     flex: 1;
     text-align: center;
@@ -148,6 +142,10 @@ export default {
       line-height: 1.8;
       white-space: nowrap;
       overflow: hidden;
+      &:hover {
+        border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 14px;
+      }
     }
   }
   .due {
