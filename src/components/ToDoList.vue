@@ -73,6 +73,7 @@ export default {
       default: "",
     },
   },
+  emits: ["upcompo"],
   computed: {
     dragOptions() {
       return {
@@ -99,6 +100,9 @@ export default {
     (async () => {
       await this.getTodo();
     })();
+  },
+  beforeUnmount() {
+    this.$emit("upcompo", this.doneList);
   },
   methods: {
     async getTodo() {
