@@ -41,6 +41,6 @@
   "dependencies": {
     "axios": "^0.24.0",
     "vue": "^3.2.20",
-    "vuedraggable": "^2.24.3"
+    "vuedraggable": "^4.1.0"
   }
 }
