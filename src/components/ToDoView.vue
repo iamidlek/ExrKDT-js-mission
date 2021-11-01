@@ -2,10 +2,10 @@
   <div class="wrapper">
     <transition name="trans">
       <div class="todo" v-if="fb">
-        <ToDoList :user="user" v-bind="$attrs" />
+        <ToDoList :user="user" @upcompo="recive" v-bind="$attrs" />
       </div>
       <div class="todo" v-else>
-        <DoneList :user="user" v-bind="$attrs" />
+        <DoneList :user="user" :data="doneItems" v-bind="$attrs" />
       </div>
     </transition>
     <div class="overturn">
@@ -36,6 +36,7 @@ export default {
     return {
       fb: true,
       content: "Done",
+      doneItems: [],
     };
   },
   methods: {
@@ -46,6 +47,9 @@ export default {
         this.content = "Done";
       }
       this.fb = !this.fb;
+    },
+    recive(doneList) {
+      this.doneItems = doneList;
     },
   },
 };
