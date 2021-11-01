@@ -168,6 +168,7 @@ export default {
   border-left: 1px solid rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(0.8px);
   user-select: none;
+  transition: 1s;
   .leaf {
     position: absolute;
     top: 32px;
