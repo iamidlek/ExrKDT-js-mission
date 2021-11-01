@@ -5,53 +5,20 @@
     </i>
     <div class="removall"><div></div></div>
     <div class="nolist">계획을 실행하세요 !</div>
-    <!-- <draggable
-      class="list"
-      tag="transition-group"
-      :component-data="{
-        tag: 'ul',
-        type: 'transition-group',
-        name: !drag ? 'flip-list' : null,
-      }"
-      v-model="toDoList"
-      v-bind="dragOptions"
-      @start="drag = true"
-      @end="dropList"
-      item-key="id"
-    >
-      <template #item="{ element }">
-        <ListItem
-          :key="element.id"
-          :item="element"
-          :user="user"
-          :donelen="doneLen"
-          @re-get-list="async () => await getTodo()"
-          @move-to-done="async () => await getTodo()"
-          @fix-info="sendToModal"
-        />
-      </template>
-    </draggable> -->
+    <ul class="list"></ul>
   </div>
-  <!-- <div v-show="addTF" class="focback">
-    <AddToDo
-      v-model="addTF"
-      v-bind="$attrs"
-      :user="user"
-      :order="orderNum"
-      class="infobox"
-      @re-get-list="async () => await getTodo()"
-    />
-  </div>
-  <div v-if="modiModal" class="modify">
-    <FixToDo
-      v-model="modiModal"
-      class="infobox"
-      :data="toModalData"
-      :user="user"
-      @refresh-list="async () => await getTodo()"
-    />
-  </div> -->
 </template>
+
+<script>
+export default {
+  props: {
+    data: {
+      type: Array,
+      default: [],
+    },
+  },
+};
+</script>
 
 <style lang="scss" scoped>
 .book {
@@ -104,9 +71,9 @@
       z-index: 1;
     }
     h3 {
-      text-align: center;
+      text-align: right;
       margin: 0.6em;
-      padding-right: 6.6em;
+      padding-right: 1.8em;
       span {
         font-size: 1.1em;
       }
@@ -119,6 +86,7 @@
     width: 18px;
     height: 24px;
     border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
     font-size: 1.6em;
     color: rgba(255, 255, 255, 0.5);
     text-align: center;
@@ -150,7 +118,7 @@
       top: 12px;
       right: -16px;
       background-color: rgba(255, 255, 255, 0.5);
-      border-radius: 16px;
+      border-radius: 20px;
       opacity: 0;
       transform: rotate(-54deg);
       transition: 0.7s;
@@ -189,50 +157,50 @@
     font-size: 1.3em;
   }
 }
-.focback {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  backdrop-filter: blur(2px);
-}
-.modify {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  backdrop-filter: blur(2px);
-}
-.infobox {
-  position: absolute;
-  width: 320px;
-  height: 256px;
-  top: 32%;
-}
+// .focback {
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   bottom: 0;
+//   display: flex;
+//   justify-content: center;
+//   backdrop-filter: blur(2px);
+// }
+// .modify {
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   bottom: 0;
+//   display: flex;
+//   justify-content: center;
+//   backdrop-filter: blur(2px);
+// }
+// .infobox {
+//   position: absolute;
+//   width: 320px;
+//   height: 256px;
+//   top: 32%;
+// }
 
-.flip-list-move {
-  transition: transform 0.5s;
-}
-.no-move {
-  transition: transform 0s;
-}
-.ghost {
-  opacity: 0.5;
-  background: #c8ebfb;
-}
-.list-group {
-  min-height: 20px;
-}
-.list-group-item {
-  cursor: move;
-}
-.list-group-item i {
-  cursor: pointer;
-}
+// .flip-list-move {
+//   transition: transform 0.5s;
+// }
+// .no-move {
+//   transition: transform 0s;
+// }
+// .ghost {
+//   opacity: 0.5;
+//   background: #c8ebfb;
+// }
+// .list-group {
+//   min-height: 20px;
+// }
+// .list-group-item {
+//   cursor: move;
+// }
+// .list-group-item i {
+//   cursor: pointer;
+// }
 </style>
