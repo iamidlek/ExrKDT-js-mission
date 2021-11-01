@@ -21,7 +21,7 @@
     </transition>
     <div
       class="title"
-      @click="change = !change">
+      @click="viewTools">
       <div>{{ item.title.split('__@dateSet-expire__Info:')[0] }}</div>
     </div>
     <transition name="icon">
@@ -83,7 +83,6 @@ export default {
         'username': this.user
         }
       })
-      // console.log(data)
     },
     async del() {
       await this.deleteTodo()
@@ -91,10 +90,17 @@ export default {
     },
     upCurrLiData() {
       const liData = {
+        id: this.item.id,
         order: this.item.order,
         title: this.item.title
       }
       this.$emit('fixInfo', liData)
+    },
+    viewTools() {
+      if (this.change !== true) {
+        this.change = !this.change
+        setTimeout(()=> this.change = !this.change,3000)
+      }
     }
   }
 }
@@ -110,8 +116,9 @@ export default {
   box-sizing: border-box;
   position: relative;
   &:hover {
-    .title {
+    .title > div {
       background: rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
     }
   }
   .title {
@@ -120,7 +127,6 @@ export default {
     margin: 0;
     font-size: 1.1em;
     padding-left: 32px;
-    border-radius: 20px;
     transition: .6s ease-in-out;
     cursor: pointer;
     & > div {
