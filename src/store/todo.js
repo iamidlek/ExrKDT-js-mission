@@ -3,7 +3,8 @@ import axios from 'axios'
 export default {
   namespaced: true,
   state: () => ({
-    todos: []
+    todos: [],
+    user: ''
   }),
   getters: {
     todoList(state) {
@@ -14,6 +15,9 @@ export default {
     }
   },
   mutations: {
+    checkUser(state) {
+      state.user = localStorage.getItem("todo")
+    },
     assignState(state, payload) {
       Object.keys(payload).forEach(key => {
         state[key] = payload[key]
