@@ -13,6 +13,10 @@
       />
       <button type="submit" class="enter">Enter</button>
     </form>
+    <div v-else class="greet">
+      <p>반갑습니다</p>
+      <p>{{ user }} 님</p>
+    </div>
   </div>
 </template>
 
@@ -23,6 +27,12 @@ export default {
       placeHolder: "YooHyungChul",
       inputVal: "",
     };
+  },
+  emits: ["signIn"],
+  mounted() {
+    if (this.user) {
+      setTimeout(() => this.$emit("signIn"), 700);
+    }
   },
   computed: {
     user() {
@@ -41,6 +51,7 @@ export default {
       } else {
         localStorage.setItem("todo", user);
         this.$store.commit("todo/checkUser");
+        this.$emit("signIn");
       }
       this.inputVal = "";
     },
@@ -111,6 +122,30 @@ export default {
       color: #efefef;
       border: 2px solid rgba(#efefef, 0.9);
       cursor: pointer;
+    }
+  }
+  .greet {
+    width: 250px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 80px;
+    box-sizing: border-box;
+    box-shadow: 20px 20px 50px rgba(0, 0, 0, 0.7);
+    border-radius: 20px;
+    background: transparent;
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(0.8px);
+    user-select: none;
+    p {
+      margin: 0;
+      font-size: 1.1em;
+      color: #efefef;
+    }
+    p:first-child {
+      margin-bottom: 32px;
     }
   }
 }
