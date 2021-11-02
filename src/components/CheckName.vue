@@ -1,77 +1,51 @@
 <template>
   <div class="wrapper">
     <h1>TooD</h1>
-    <form
-      class="form"
-      @submit.prevent="recive">
-      <p>{{ info }}</p>
+    <form v-if="!user" class="form" @submit.prevent="recive">
+      <p>이름을 입력해 주세요</p>
       <input
-        v-show="need"
-        v-model="userName"
         type="text"
+        v-model="inputVal"
         autocomplete="off"
         :placeholder="placeHolder"
         onfocus="placeholder = ''"
-        :onblur="`placeholder = '${placeHolder}'`" />
-      <button
-        v-show="need"
-        type="submit"
-        class="enter">
-        Enter
-      </button>
+        :onblur="`placeholder = '${placeHolder}'`"
+      />
+      <button type="submit" class="enter">Enter</button>
     </form>
   </div>
 </template>
 
 <script>
 export default {
-  props: {
-    modelValue: { 
-      type: Boolean
-    },
-    // user: {
-    //   type: String,
-    //   default: ''
-    // }
-  },
-  emits: ['enroll','update:modelValue'],
   data() {
     return {
-      userName: '',
-      info: '이름을 입력해 주세요',
-      placeHolder: 'YooHyungChul',
-      need: true,
-    }
+      placeHolder: "YooHyungChul",
+      inputVal: "",
+    };
   },
-  mounted() {
-    const user = localStorage.getItem('todo')
-    if (user) {
-      this.placeHolder = user
-      this.info = `안녕하세요 ${user}님`
-      this.need = false
-    }
-  },
-  unmounted() {
-    setTimeout(()=>{
-      this.$emit('update:modelValue', true)
-      },1000)
+  computed: {
+    user() {
+      return this.$store.state.todo.user;
+    },
   },
   methods: {
-    recive() {
-      if (this.userName === '') return 
-      if (/\s/g.test(this.userName)){
-        this.placeHolder = '공백을 제거해 주세요'
-        this.userName = ''
-      } else if (!/[a-zA-Z]/g.test(this.userName)){
-        this.placeHolder = '영문 입력만 가능합니다'
-        this.userName = ''
+    recive(e) {
+      const user = e.target[0].value;
+      if (user === "") {
+        this.placeHolder = "영문 이름을 입력하세요";
+      } else if (!/[a-zA-Z]/g.test(user)) {
+        this.placeHolder = "영문 입력만 가능합니다";
+      } else if (/\s/g.test(user)) {
+        this.placeHolder = "공백을 제거해 주세요";
       } else {
-        localStorage.setItem('todo',this.userName)
-        this.$emit('enroll', true)
+        localStorage.setItem("todo", user);
+        this.$store.commit("todo/checkUser");
       }
-    }
-  }
-}
+      this.inputVal = "";
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -88,7 +62,7 @@ export default {
     line-height: 1.2;
     margin-left: 0.06em;
     margin-bottom: 0.4em;
-    text-shadow: 1px 5px 5px #1B0705;
+    text-shadow: 1px 5px 5px #1b0705;
     animation: updown 5s linear infinite;
     user-select: none;
   }
@@ -98,7 +72,7 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    box-shadow: 20px 20px 50px rgba(0,0,0,0.7);
+    box-shadow: 20px 20px 50px rgba(0, 0, 0, 0.7);
     border-radius: 20px;
     background: transparent;
     border-top: 1px solid rgba(255, 255, 255, 0.5);
@@ -120,11 +94,11 @@ export default {
       width: 80%;
       font-size: 1.1em;
       line-height: 2em;
-      background-color:rgba(#efefef, .9);
+      background-color: rgba(#efefef, 0.9);
       color: #0f0f0f;
       caret-color: transparent;
       &::placeholder {
-        color: rgba(#0f0f0f, .9);
+        color: rgba(#0f0f0f, 0.9);
       }
     }
     button {
@@ -135,13 +109,14 @@ export default {
       line-height: 2em;
       background-color: transparent;
       color: #efefef;
-      border: 2px solid rgba(#efefef, .9);
+      border: 2px solid rgba(#efefef, 0.9);
       cursor: pointer;
     }
   }
 }
 @keyframes updown {
-  0%,100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
