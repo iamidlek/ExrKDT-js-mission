@@ -1,8 +1,8 @@
 <template>
   <BackGround />
   <transition name="fade">
-    <div v-if="effect"></div>
-    <CheckName v-else-if="!user" />
+    <div v-if="effect === 'init'"></div>
+    <CheckName v-else-if="effect === 'check'" @sign-in="effect = 'signed'" />
     <ToDoView v-else />
   </transition>
 </template> 
@@ -20,7 +20,7 @@ export default {
   },
   data() {
     return {
-      effect: true,
+      effect: "init",
     };
   },
   computed: {
@@ -29,7 +29,7 @@ export default {
     },
   },
   mounted() {
-    setTimeout(() => (this.effect = false), 100);
+    setTimeout(() => (this.effect = "check"), 700);
     this.$store.commit("todo/checkUser");
   },
 };
@@ -38,11 +38,11 @@ export default {
 <style lang="scss" scoped>
 .fade-enter-active {
   opacity: 1;
-  transition: 2s linear;
+  transition: 1.5s ease-in-out;
 }
 .fade-leave-active {
   opacity: 0;
-  transition: 1s linear;
+  transition: 0.7s ease-in-out;
 }
 .fade-enter-from {
   opacity: 0;
