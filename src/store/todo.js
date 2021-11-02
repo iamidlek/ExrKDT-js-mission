@@ -3,15 +3,15 @@ import axios from 'axios'
 export default {
   namespaced: true,
   state: () => ({
-    todos: [],
+    allList: [],
     user: ''
   }),
   getters: {
     todoList(state) {
-      return state.todos.filter(todo => !todo.done)
+      return state.allList.filter(todo => !todo.done)
     },
     doneList(state) {
-      return state.todos.filter(todo => todo.done)
+      return state.allList.filter(todo => todo.done)
     }
   },
   mutations: {
@@ -24,24 +24,26 @@ export default {
       })
     },
     updateTodo(state, todo) {
-      const foundTodo = state.todos.find(t => t.id === todo.id)
-      foundTodo = todo
-    }
+      const idx = state.allList.findIndex(todos => todos.id === todo.id)
+      state.allList[idx] = todo
+    },
+    delTodo(state, id) {
+      const idx = state.allList.findIndex(todos => todos.id === id)
+      state.allList.splice(idx, 1)
+    },
   },
   actions: {
-    async getTodos({ commit }) {
-      const { data: todos } = await axios({
+    async getTodos({ state, commit }) {
+      const { data: allList } = await axios({
         url: "https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos",
         method: "get",
         headers: {
           "content-type": "application/json",
           apikey: "FcKdtJs202110",
-          username: 'YooHyungChul',
+          username: state.user,
         },
       });
-      commit('assignState', {
-        todos
-      })
+      commit('assignState', { allList })
     },
     createTodo() {
 
@@ -49,7 +51,7 @@ export default {
     updateTodo() {
 
     },
-    async doneTodo({ getters, commit }, todo) {
+    async doneTodo({ state, getters, commit }, todo) {
       const { id, title } = todo
       const { data } = await axios({
         url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
@@ -57,7 +59,7 @@ export default {
         headers: {
           "content-type": "application/json",
           apikey: "FcKdtJs202110",
-          username: this.user,
+          username: state.user,
         },
         data: {
           order: 3000 + getters.doneList.length,
@@ -67,16 +69,17 @@ export default {
       });
       commit('updateTodo', data)
     },
-    async deleteTodo(context, todoId) {
+    async deleteTodo({state, commit}, id) {
       await axios({
-        url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${todoId}`,
+        url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
         method: "delete",
         headers: {
           "content-type": "application/json",
           apikey: "FcKdtJs202110",
-          username: 'YooHyungChul',
+          username: state.user,
         },
       });
+      commit('delTodo', id)
     }
   }
 }
