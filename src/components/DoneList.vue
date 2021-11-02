@@ -4,11 +4,13 @@
       <h3><span>D</span>one List</h3>
     </i>
     <div class="removall"><div></div></div>
-    <div class="nolist" v-if="this.len">계획을 실행하세요 !</div>
-    <ul class="list" v-else>
-      <li v-for="item in data" :key="item.id">
-        <span>{{ item.title }}</span>
-        <span>{{ item.updatedAt }}</span>
+    <ul class="list">
+      <div class="nolist" v-if="!doneList.length">계획을 실행하세요 !</div>
+      <li v-else v-for="item in doneList" :key="item.id">
+        <div class="content">
+          <span>{{ item.title.split("__@dateSet-expire__Info:")[0] }}</span>
+          <span>{{ item.updatedAt.replace("T", " ").substr(0, 10) }}</span>
+        </div>
       </li>
     </ul>
   </div>
@@ -16,19 +18,10 @@
 
 <script>
 export default {
-  props: {
-    data: {
-      type: Object,
-      default: [],
+  computed: {
+    doneList() {
+      return this.$store.getters["todo/doneList"];
     },
-    len: {
-      type: Number,
-      default: 0,
-    },
-  },
-  beforeMount() {
-    console.log(this.data);
-    console.log(this.len);
   },
 };
 </script>
@@ -159,6 +152,9 @@ export default {
     scrollbar-width: none;
     &::-webkit-scrollbar {
       display: none;
+    }
+    .content {
+      width: 100%;
     }
   }
   .nolist {

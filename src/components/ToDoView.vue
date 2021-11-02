@@ -2,15 +2,11 @@
   <div class="wrapper">
     <transition name="trans">
       <div class="todo" v-if="fb">
-        <ToDoList :user="user" @upcompo="recive" v-bind="$attrs" />
+        <!-- <ToDoList :user="user" @upcompo="recive" v-bind="$attrs" /> -->
+        <!-- <ToDoList :user="user" /> -->
       </div>
       <div class="todo" v-else>
-        <DoneList
-          :user="user"
-          :data="doneItems"
-          :len="doneLen"
-          v-bind="$attrs"
-        />
+        <DoneList :user="user" />
       </div>
     </transition>
     <div class="overturn">
@@ -41,9 +37,11 @@ export default {
     return {
       fb: true,
       content: "Done",
-      doneItems: [],
-      doneLen: 0,
     };
+  },
+  async created() {
+    await this.$store.dispatch("todo/getTodos");
+    console.log(this.$store.state.todo.todos);
   },
   methods: {
     transfb() {
@@ -53,10 +51,6 @@ export default {
         this.content = "Done";
       }
       this.fb = !this.fb;
-    },
-    recive(data) {
-      this.doneItems = data.list;
-      this.doneLen = data.len;
     },
   },
 };

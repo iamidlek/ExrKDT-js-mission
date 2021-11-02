@@ -72,6 +72,10 @@ export default {
       type: String,
       default: "",
     },
+    toDoList: {
+      type: Array,
+      default: () => [],
+    },
   },
   emits: ["upcompo"],
   computed: {
@@ -91,7 +95,6 @@ export default {
       addTF: false,
       modiModal: false,
       toModalData: {},
-      toDoList: [],
       doneList: [],
       doneLen: 0,
     };

@@ -95,20 +95,7 @@ export default {
       }
     },
     async doneTodo() {
-      await axios({
-        url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${this.item.id}`,
-        method: "put",
-        headers: {
-          "content-type": "application/json",
-          apikey: "FcKdtJs202110",
-          username: this.user,
-        },
-        data: {
-          order: 3000 + this.donelen,
-          title: this.item.title,
-          done: true,
-        },
-      });
+      this.$store.dispatch("todo/doneTodo", item);
     },
     async done(e) {
       if (e.target.checked) {
