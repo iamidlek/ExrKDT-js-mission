@@ -1,19 +1,18 @@
 <template>
   <div class="wrapper">
-    <transition name="trans">
-      <div class="todo" v-if="fb">
-        <!-- <ToDoList :user="user" @upcompo="recive" v-bind="$attrs" /> -->
-        <!-- <ToDoList :user="user" /> -->
+    <transition name="reverse">
+      <div class="todo" v-if="turn">
+        <ToDoList />
       </div>
       <div class="todo" v-else>
-        <DoneList :user="user" />
+        <DoneList />
       </div>
     </transition>
     <div class="overturn">
       <a class="arrowBox">
         <span class="arrow"></span>
       </a>
-      <button @click="transfb">{{ content }}</button>
+      <button @click="turnning">{{ content }}</button>
     </div>
   </div>
 </template>
@@ -27,30 +26,28 @@ export default {
     ToDoList,
     DoneList,
   },
-  props: {
-    user: {
-      type: String,
-      default: "",
-    },
-  },
   data() {
     return {
-      fb: true,
+      turn: true,
+      throttling: true,
       content: "Done",
     };
   },
   async created() {
+    // 최초 서버 요청
     await this.$store.dispatch("todo/getTodos");
-    console.log(this.$store.state.todo.todos);
+    setTimeout(() => {
+      console.log("loading 표시를 기본으로 하고 1초뒤 없어지게");
+    }, 1000);
   },
   methods: {
-    transfb() {
-      if (this.fb) {
-        this.content = "ToDo";
-      } else {
-        this.content = "Done";
+    turnning() {
+      if (this.throttling) {
+        this.throttling = false;
+        this.turn ? (this.content = "ToDo") : (this.content = "Done");
+        this.turn = !this.turn;
+        setTimeout(() => (this.throttling = true), 800);
       }
-      this.fb = !this.fb;
     },
   },
 };
@@ -129,17 +126,17 @@ export default {
     }
   }
 }
-.trans-enter-active {
+.reverse-enter-active {
   opacity: 1;
   transform: rotateY(0deg);
   transition: 0.7s ease-in-out;
 }
-.trans-leave-active {
+.reverse-leave-active {
   opacity: 0;
   transform: rotateY(180deg);
   transition: 0.7s ease-in-out;
 }
-.trans-enter-from {
+.reverse-enter-from {
   opacity: 0;
   transform: rotateY(-180deg);
 }
