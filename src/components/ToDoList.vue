@@ -4,7 +4,7 @@
       <h3><span>T</span>o Do List</h3>
     </i>
     <div class="add" @click="open">+</div>
-    <div v-if="!toDoList.length" class="nolist">ToDo를 추가하세요</div>
+    <div v-if="!todoList.length" class="nolist">ToDo를 추가하세요</div>
     <draggable
       class="list"
       tag="transition-group"
@@ -13,30 +13,21 @@
         type: 'transition-group',
         name: !drag ? 'flip-list' : null,
       }"
-      v-model="toDoList"
+      v-model="todoList"
       v-bind="dragOptions"
       @start="drag = true"
-      @end="dropList"
+      @end="reorderList"
       item-key="id"
     >
       <template #item="{ element }">
-        <ListItem
-          :key="element.id"
-          :item="element"
-          :user="user"
-          :donelen="doneLen"
-          @re-get-list="async () => await getTodo()"
-          @move-to-done="async () => await getTodo()"
-          @fix-info="sendToModal"
-        />
+        <ListItem :key="element.id" :item="element" />
       </template>
     </draggable>
   </div>
-  <div v-show="addTF" class="focback">
+  <div v-show="addTF" class="addmodal">
     <AddToDo
       v-model="addTF"
       v-bind="$attrs"
-      :user="user"
       :order="orderNum"
       class="infobox"
       @re-get-list="async () => await getTodo()"
@@ -47,7 +38,6 @@
       v-model="modiModal"
       class="infobox"
       :data="toModalData"
-      :user="user"
       @refresh-list="async () => await getTodo()"
     />
   </div>
@@ -67,17 +57,6 @@ export default {
     AddToDo,
     FixToDo,
   },
-  props: {
-    user: {
-      type: String,
-      default: "",
-    },
-    toDoList: {
-      type: Array,
-      default: () => [],
-    },
-  },
-  emits: ["upcompo"],
   computed: {
     dragOptions() {
       return {
@@ -87,6 +66,9 @@ export default {
         ghostClass: "ghost",
       };
     },
+    todoList() {
+      return this.$store.getters["todo/todoList"];
+    },
   },
   data() {
     return {
@@ -95,44 +77,9 @@ export default {
       addTF: false,
       modiModal: false,
       toModalData: {},
-      doneList: [],
-      doneLen: 0,
     };
   },
-  beforeMount() {
-    (async () => {
-      await this.getTodo();
-    })();
-  },
-  beforeUnmount() {
-    const data = { list: this.doneList, len: this.doneList.length };
-    this.$emit("upcompo", data);
-  },
   methods: {
-    async getTodo() {
-      const { data } = await axios({
-        url: "https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos",
-        method: "get",
-        headers: {
-          "content-type": "application/json",
-          apikey: "FcKdtJs202110",
-          username: `${this.user}`,
-        },
-      });
-      const tempList = [];
-      const tempDone = [];
-      data.forEach((item) => {
-        if (item.done === false) {
-          tempList.unshift(item);
-        } else {
-          tempDone.push(item);
-        }
-      });
-      this.orderNum = tempList.length;
-      this.toDoList = tempList;
-      this.doneLen = tempDone.length;
-      this.doneList = tempDone;
-    },
     open() {
       this.addTF = true;
     },
@@ -152,7 +99,7 @@ export default {
         data: { todoIds: idArray },
       });
     },
-    dropList() {
+    reorderList() {
       const idList = this.toDoList.map((item) => item.id).reverse();
       this.arrangeTodo(idList);
       this.drag = false;
@@ -241,7 +188,7 @@ export default {
     margin-top: 6.8em;
     padding: 0;
     height: 360px;
-    width: 70%;
+    width: 80%;
     overflow: auto;
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
@@ -261,7 +208,7 @@ export default {
     font-size: 1.3em;
   }
 }
-.focback {
+.addmodal {
   position: absolute;
   top: 0;
   left: 0;
