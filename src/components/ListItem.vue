@@ -12,14 +12,14 @@
         <div class="cross2"></div>
       </div>
     </transition>
-    <div class="title" @click="viewTools">
+    <div class="title" @click="changeToggle">
       <div>{{ item.title.split("__@dateSet-expire__Info:")[0] }}</div>
     </div>
     <transition name="icon">
       <p v-if="!change" class="due" :class="{ expire: calcDate }">
         {{ item.title.split("__@dateSet-expire__Info:")[1].slice(-5) }}
       </p>
-      <div v-else class="fix" @click="upCurrLiData">
+      <div v-else class="fix" @click="fixModal">
         <span></span>
       </div>
     </transition>
@@ -35,72 +35,59 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    user: {
-      type: String,
-      default: "",
-    },
-    donelen: {
-      type: Number,
-      default: 0,
-    },
   },
-  emits: ["reGetList", "fixInfo", "moveToDone"],
+  // emits: ["reGetList", "fixInfo", "moveToDone"],
   data() {
     return {
       change: false,
     };
   },
   computed: {
-    calcDate() {
-      const date = new Date();
-      const setted = new Date(
-        this.item.title.split("__@dateSet-expire__Info:")[1]
-      );
-      if (date > setted) {
-        return true;
-      } else {
-        return false;
-      }
-    },
+    // calcDate() {
+    //   const date = new Date();
+    //   const setted = new Date(
+    //     this.item.title.split("__@dateSet-expire__Info:")[1]
+    //   );
+    //   if (date > setted) {
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // },
   },
   methods: {
-    async deleteTodo() {
-      await axios({
-        url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${this.item.id}`,
-        method: "delete",
-        headers: {
-          "content-type": "application/json",
-          apikey: "FcKdtJs202110",
-          username: this.user,
-        },
-      });
+    async done(e) {
+      if (e.target.checked) {
+        this.$store.dispatch("todo/doneTodo", this.item);
+      }
     },
     async del() {
-      await this.deleteTodo();
-      this.$emit("reGetList");
+      this.$store.dispatch("todo/deleteTodo", this.item.id);
     },
-    upCurrLiData() {
+    // async deleteTodo() {
+    //   await axios({
+    //     url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${this.item.id}`,
+    //     method: "delete",
+    //     headers: {
+    //       "content-type": "application/json",
+    //       apikey: "FcKdtJs202110",
+    //       username: this.user,
+    //     },
+    //   });
+    // },
+    fixModal() {
       const liData = {
         id: this.item.id,
         order: this.item.order,
         title: this.item.title,
         modiDate: this.item.updatedAt,
       };
-      this.$emit("fixInfo", liData);
+      this.$emit("currItem", liData);
     },
-    viewTools() {
+    changeToggle() {
       if (this.change !== true) {
         this.change = !this.change;
         setTimeout(() => (this.change = !this.change), 3000);
-      }
-    },
-    async doneTodo() {
-      this.$store.dispatch("todo/doneTodo", item);
-    },
-    async done(e) {
-      if (e.target.checked) {
-        await this.doneTodo();
-        this.$emit("moveToDone");
       }
     },
   },
