@@ -17,7 +17,7 @@
     </div>
     <transition name="icon">
       <p v-if="!change" class="due" :class="{ expire: dDay < 1 }">
-        D-{{ dDay }}
+        {{ dDay }}
       </p>
       <div v-else class="fix" @click="openFixModal">
         <span></span>
@@ -46,7 +46,11 @@ export default {
       const setted = new Date(
         this.item.title.split("__@dateSet-expire__Info:")[1]
       );
-      return parseInt((setted - date) / 86400000);
+      const d = Math.ceil((setted - date) / 86400000);
+      if (d < 0) {
+        return d;
+      }
+      return "D-", d;
     },
   },
   methods: {
