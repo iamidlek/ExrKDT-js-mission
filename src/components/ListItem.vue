@@ -47,10 +47,8 @@ export default {
         this.item.title.split("__@dateSet-expire__Info:")[1]
       );
       const d = Math.ceil((setted - date) / 86400000);
-      if (d < 0) {
-        return d;
-      }
-      return "D-", d;
+
+      return d;
     },
   },
   methods: {
