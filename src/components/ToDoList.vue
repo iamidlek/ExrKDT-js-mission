@@ -3,8 +3,8 @@
     <i class="leaf">
       <h3><span>T</span>o Do List</h3>
     </i>
-    <div class="add" @click="open">+</div>
-    <div v-if="!todoList.length" class="nolist">ToDo를 추가하세요</div>
+    <div class="add" @click="openAdd">+</div>
+    <div v-if="!todos.length" class="nolist">ToDo를 추가하세요</div>
     <draggable
       class="list"
       tag="transition-group"
@@ -13,38 +13,26 @@
         type: 'transition-group',
         name: !drag ? 'flip-list' : null,
       }"
-      v-model="todoList"
+      v-model="todos"
       v-bind="dragOptions"
-      @start="drag = true"
-      @end="reorderList"
+      @start="dragStart"
+      @end="dragEnd"
       item-key="id"
     >
       <template #item="{ element }">
-        <ListItem :key="element.id" :item="element" />
+        <ListItem :key="element.id" :item="element" @fix-info="openfix" />
       </template>
     </draggable>
   </div>
-  <div v-show="addTF" class="addmodal">
-    <AddToDo
-      v-model="addTF"
-      v-bind="$attrs"
-      :order="orderNum"
-      class="infobox"
-      @re-get-list="async () => await getTodo()"
-    />
+  <div v-show="addOpen" class="addmodal">
+    <AddToDo v-model="addOpen" class="infobox" />
   </div>
-  <div v-if="modiModal" class="modify">
-    <FixToDo
-      v-model="modiModal"
-      class="infobox"
-      :data="toModalData"
-      @refresh-list="async () => await getTodo()"
-    />
+  <div v-if="fixOpen" class="modify">
+    <FixToDo v-model="fixOpen" :data="fixItem" class="infobox" />
   </div>
 </template>
 
 <script>
-import axios from "axios";
 import draggable from "vuedraggable";
 import ListItem from "~/components/ListItem";
 import AddToDo from "~/components/AddToDo";
@@ -60,48 +48,42 @@ export default {
   computed: {
     dragOptions() {
       return {
-        animation: 200,
+        animation: 20,
         group: "description",
         disabled: false,
         ghostClass: "ghost",
       };
     },
-    todoList() {
-      return this.$store.getters["todo/todoList"];
+    todos: {
+      get() {
+        return this.$store.getters["todo/todoList"];
+      },
+      set(val) {
+        const idList = val.map((item) => item.id);
+        this.$store.dispatch("todo/lineUp", idList);
+      },
     },
   },
   data() {
     return {
       drag: false,
-      orderNum: 0,
-      addTF: false,
-      modiModal: false,
-      toModalData: {},
+      addOpen: false,
+      fixItem: {},
+      fixOpen: false,
     };
   },
   methods: {
-    open() {
-      this.addTF = true;
+    openAdd() {
+      this.addOpen = true;
     },
-    sendToModal(data) {
-      this.toModalData = data;
-      this.modiModal = true;
+    openfix(needfix) {
+      this.fixItem = needfix;
+      this.fixOpen = true;
     },
-    async arrangeTodo(idArray) {
-      const { data } = await axios({
-        url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/reorder`,
-        method: "put",
-        headers: {
-          "content-type": "application/json",
-          apikey: "FcKdtJs202110",
-          username: this.user,
-        },
-        data: { todoIds: idArray },
-      });
+    dragStart() {
+      this.drag = true;
     },
-    reorderList() {
-      const idList = this.toDoList.map((item) => item.id).reverse();
-      this.arrangeTodo(idList);
+    dragEnd() {
       this.drag = false;
     },
   },
@@ -236,7 +218,7 @@ export default {
 }
 
 .flip-list-move {
-  transition: transform 0.5s;
+  transition: transform 0.3s;
 }
 .no-move {
   transition: transform 0s;
