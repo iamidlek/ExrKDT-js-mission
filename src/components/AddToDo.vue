@@ -11,7 +11,6 @@
       onfocus="placeholder = ''"
       :onblur="`placeholder = '${placeHolder}'`"
       maxlength="20"
-      contenteditable="true"
     />
     <label for="goal">Due Date</label>
     <input
@@ -36,16 +35,8 @@ export default {
     modelValue: {
       type: Boolean,
     },
-    user: {
-      type: String,
-      default: "",
-    },
-    order: {
-      type: Number,
-      default: 0,
-    },
   },
-  emits: ["update:modelValue", "reGetList"],
+  emits: ["update:modelValue"],
   data() {
     return {
       placeHolder: "Make To Do",
@@ -63,33 +54,18 @@ export default {
     },
   },
   methods: {
-    async adding(e) {
+    adding(e) {
       const { target } = e;
       if (!target[0].value) {
-        e.target[0].placeholder = "입력이 필요합니다";
+        target[0].placeholder = "입력이 필요합니다";
         return;
       }
-      const obj = {
+      const Content = {
         title: `${target[0].value}${target[1].name}${target[1].value}`,
-        order: this.order,
       };
-
-      await this.createTodo(this.user, obj);
-      this.$emit("reGetList");
+      this.$store.dispatch("todo/createTodo", Content);
+      target[0].value = "";
       this.$emit("update:modelValue", false);
-      e.target[0].value = "";
-    },
-    async createTodo(user, item) {
-      await axios({
-        url: "https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos",
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          apikey: "FcKdtJs202110",
-          username: user,
-        },
-        data: item,
-      });
     },
     closing() {
       this.$refs.title.value = "";
