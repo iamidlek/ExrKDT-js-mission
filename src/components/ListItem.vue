@@ -16,10 +16,10 @@
       <div>{{ item.title.split("__@dateSet-expire__Info:")[0] }}</div>
     </div>
     <transition name="icon">
-      <p v-if="!change" class="due" :class="{ expire: calcDate }">
-        {{ item.title.split("__@dateSet-expire__Info:")[1].slice(-5) }}
+      <p v-if="!change" class="due" :class="{ expire: dDay < 1 }">
+        D-{{ dDay }}
       </p>
-      <div v-else class="fix" @click="fixModal">
+      <div v-else class="fix" @click="openFixModal">
         <span></span>
       </div>
     </transition>
@@ -27,8 +27,6 @@
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
   props: {
     item: {
@@ -36,24 +34,20 @@ export default {
       default: () => ({}),
     },
   },
-  // emits: ["reGetList", "fixInfo", "moveToDone"],
+  emits: ["fixInfo"],
   data() {
     return {
       change: false,
     };
   },
   computed: {
-    // calcDate() {
-    //   const date = new Date();
-    //   const setted = new Date(
-    //     this.item.title.split("__@dateSet-expire__Info:")[1]
-    //   );
-    //   if (date > setted) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // },
+    dDay() {
+      const date = new Date();
+      const setted = new Date(
+        this.item.title.split("__@dateSet-expire__Info:")[1]
+      );
+      return parseInt((setted - date) / 86400000);
+    },
   },
   methods: {
     async done(e) {
@@ -64,31 +58,11 @@ export default {
     async del() {
       this.$store.dispatch("todo/deleteTodo", this.item.id);
     },
-    // async deleteTodo() {
-    //   await axios({
-    //     url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${this.item.id}`,
-    //     method: "delete",
-    //     headers: {
-    //       "content-type": "application/json",
-    //       apikey: "FcKdtJs202110",
-    //       username: this.user,
-    //     },
-    //   });
-    // },
-    fixModal() {
-      const liData = {
-        id: this.item.id,
-        order: this.item.order,
-        title: this.item.title,
-        modiDate: this.item.updatedAt,
-      };
-      this.$emit("currItem", liData);
+    openFixModal() {
+      this.$emit("fixInfo", this.item);
     },
     changeToggle() {
-      if (this.change !== true) {
-        this.change = !this.change;
-        setTimeout(() => (this.change = !this.change), 3000);
-      }
+      this.change = !this.change;
     },
   },
 };
@@ -112,7 +86,7 @@ export default {
     transition: 0.6s ease-in-out;
     cursor: pointer;
     & > div {
-      width: 157px;
+      width: 200px;
       line-height: 1.8;
       white-space: nowrap;
       overflow: hidden;
@@ -125,8 +99,8 @@ export default {
   .due {
     position: absolute;
     right: 2px;
-    bottom: 0;
-    font-size: 1.1em;
+    bottom: 2px;
+    font-size: 1em;
     pointer-events: none;
     &.expire {
       color: #d80808;
