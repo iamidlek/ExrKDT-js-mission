@@ -3,14 +3,29 @@
     <i class="leaf">
       <h3><span>D</span>one List</h3>
     </i>
-    <div class="removall"><div></div></div>
+    <div class="removall" @click="clear"><div></div></div>
     <ul class="list">
       <div class="nolist" v-if="!doneList.length">계획을 실행하세요 !</div>
-      <li v-else v-for="item in doneList" :key="item.id">
+      <li v-else v-for="item in doneList" :key="item.id" class="contentbox">
         <div class="content">
+          <span>{{ item.updatedAt.substr(5, 5) }}</span>
           <span>{{ item.title.split("__@dateSet-expire__Info:")[0] }}</span>
-          <span>{{ item.updatedAt.replace("T", " ").substr(0, 10) }}</span>
         </div>
+        <div class="del" @click.capture="die" :data-id="item.id">
+          <div class="cross1"></div>
+          <div class="cross2"></div>
+        </div>
+        <label :for="item.id">
+          <input
+            :id="item.id"
+            type="checkbox"
+            @click="backTodo"
+            :data-title="item.title"
+          />
+          <span>
+            <i></i>
+          </span>
+        </label>
       </li>
     </ul>
   </div>
@@ -21,6 +36,23 @@ export default {
   computed: {
     doneList() {
       return this.$store.getters["todo/doneList"];
+    },
+  },
+  methods: {
+    die(e) {
+      this.$store.dispatch("todo/deleteTodo", e.target.dataset.id);
+    },
+    backTodo(e) {
+      if (e.target.checked) {
+        const item = { id: e.target.id, title: e.target.dataset.title };
+        this.$store.dispatch("todo/returnTodo", item);
+      }
+    },
+    clear() {
+      const allDones = this.doneList.map((item) => item.id);
+      allDones.forEach((id) => {
+        this.$store.dispatch("todo/deleteTodo", id);
+      });
     },
   },
 };
@@ -143,7 +175,7 @@ export default {
     margin-top: 6.8em;
     padding: 0;
     height: 360px;
-    width: 70%;
+    width: 80%;
     overflow: auto;
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
@@ -153,8 +185,155 @@ export default {
     &::-webkit-scrollbar {
       display: none;
     }
-    .content {
+    .contentbox {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
       width: 100%;
+      height: 54px;
+      box-sizing: border-box;
+      position: relative;
+      &::before {
+        content: "";
+        position: absolute;
+        top: 10px;
+        width: 100%;
+        height: 36px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+      }
+      .content {
+        width: 100%;
+        display: flex;
+        span {
+          padding-left: 10px;
+          &:last-child {
+            display: inline-block;
+            width: 142px;
+            white-space: nowrap;
+            overflow: hidden;
+          }
+        }
+      }
+      .del {
+        width: 28px;
+        height: 28px;
+        position: absolute;
+        right: 34px;
+        top: 14px;
+        cursor: pointer;
+        margin-right: 10px;
+        background: transparent;
+        cursor: pointer;
+        .cross1 {
+          width: 18px;
+          height: 18px;
+          border-right: 2px solid rgba(#efefef, 0.5);
+          transform: rotate(45deg) translateX(-2px);
+          pointer-events: none;
+        }
+        .cross2 {
+          width: 18px;
+          height: 18px;
+          border-right: 2px solid rgba(#efefef, 0.5);
+          transform: rotate(-45deg) translateX(4px) translateY(-6px);
+          pointer-events: none;
+        }
+        &:hover {
+          .cross1,
+          .cross2 {
+            border-color: rgba(#efefef, 0.9);
+          }
+        }
+      }
+      label {
+        width: 28px;
+        height: 28px;
+        position: absolute;
+        cursor: pointer;
+        margin-right: 10px;
+        right: 0;
+        input {
+          position: relative;
+          z-index: 1;
+          appearance: none;
+          pointer-events: none;
+          &:checked {
+            & ~ span {
+              background-color: #d80808;
+              box-shadow: 0 5px 5px #fe000044;
+              i::after {
+                position: absolute;
+                bottom: 16px;
+                left: calc(50% - 15px);
+                width: 14px;
+                height: 2px;
+                border-radius: 6px;
+                background-color: #efefefce;
+                transition: 0.5s;
+              }
+            }
+          }
+        }
+        span {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: #05be05;
+          border-radius: 80px;
+          transition: 0.5s;
+          box-shadow: 0 5px 5px #05be0566;
+          pointer-events: none;
+          i {
+            position: absolute;
+            top: -16px;
+            left: -6px;
+            width: 57px;
+            height: 52px;
+            &::before {
+              content: "";
+              position: absolute;
+              top: 24px;
+              left: 12px;
+              width: 5px;
+              height: 5px;
+              border-radius: 50%;
+              background-color: #efefefce;
+              /* 오른쪽 눈 */
+              box-shadow: 10px 0 0 #efefefce;
+            }
+            &::after {
+              content: "";
+              position: absolute;
+              bottom: 16px;
+              left: calc(50% - 15px);
+              width: 14px;
+              bottom: 12px;
+              height: 8px;
+              border-radius: 6px;
+              border-bottom-left-radius: 15px;
+              border-bottom-right-radius: 15px;
+              background-color: #efefefce;
+              transition: 0.5s;
+            }
+          }
+        }
+        &:hover {
+          span {
+            background-color: #d80808;
+            box-shadow: 0 5px 5px #fe000044;
+          }
+          i::after {
+            content: "";
+            bottom: 16px;
+            height: 2px;
+            border-radius: 6px;
+            background-color: #efefefce;
+          }
+        }
+      }
     }
   }
   .nolist {
@@ -166,50 +345,4 @@ export default {
     font-size: 1.3em;
   }
 }
-// .focback {
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   right: 0;
-//   bottom: 0;
-//   display: flex;
-//   justify-content: center;
-//   backdrop-filter: blur(2px);
-// }
-// .modify {
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   right: 0;
-//   bottom: 0;
-//   display: flex;
-//   justify-content: center;
-//   backdrop-filter: blur(2px);
-// }
-// .infobox {
-//   position: absolute;
-//   width: 320px;
-//   height: 256px;
-//   top: 32%;
-// }
-
-// .flip-list-move {
-//   transition: transform 0.5s;
-// }
-// .no-move {
-//   transition: transform 0s;
-// }
-// .ghost {
-//   opacity: 0.5;
-//   background: #c8ebfb;
-// }
-// .list-group {
-//   min-height: 20px;
-// }
-// .list-group-item {
-//   cursor: move;
-// }
-// .list-group-item i {
-//   cursor: pointer;
-// }
 </style>
