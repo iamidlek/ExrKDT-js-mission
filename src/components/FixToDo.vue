@@ -1,9 +1,9 @@
 <template>
-  <form @submit.prevent="fixing">
+  <form @submit.prevent="fixed">
     <label for="fix-title" class="t">Fix Title</label>
     <input
       id="fix-title"
-      ref="ftitle"
+      ref="fixtitle"
       type="text"
       name="title"
       autocomplete="off"
@@ -11,8 +11,8 @@
       onfocus="placeholder = ''"
       :onblur="`prescheholder = '${placeHolder}'`"
       maxlength="20"
-      contenteditable="true"
     />
+    <p class="modi-info">{{ recentModify }}</p>
     <label for="resche">Reschedule</label>
     <input
       id="resche"
@@ -21,7 +21,6 @@
       name="__@dateSet-expire__Info:"
     />
     <button type="submit" class="fix">F i x</button>
-    <p class="modi-info">{{ recentModify }}</p>
     <div class="close" @click="closing">
       <div class="cross1"></div>
       <div class="cross2"></div>
@@ -30,28 +29,17 @@
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
   props: {
     modelValue: {
       type: Boolean,
-    },
-    user: {
-      type: String,
-      default: "",
     },
     data: {
       type: Object,
       default: () => ({}),
     },
   },
-  emits: ["update:modelValue", "refreshList"],
-  data() {
-    return {
-      placeHolder: this.data.title.split("__@dateSet-expire__Info:")[0],
-    };
-  },
+  emits: ["update:modelValue"],
   computed: {
     today() {
       const date = new Date();
@@ -63,44 +51,31 @@ export default {
       return date.getFullYear() + "-" + month + "-" + day;
     },
     recentModify() {
-      const updatted = this.data.modiDate;
-      return "최신 갱신일 : " + updatted.replace("T", " ").substr(0, 16);
+      const updatted = this.data.updatedAt;
+      return updatted.substr(0, 10) + " 갱신됨";
+    },
+    placeHolder() {
+      return this.data.title.split("__@dateSet-expire__Info:")[0];
     },
   },
   methods: {
-    async fixing(e) {
+    fixed(e) {
       const { target } = e;
       if (!target[0].value) {
-        e.target[0].placeholder = "입력이 필요합니다";
+        target[0].placeholder = "입력이 필요합니다";
         return;
       }
-      const obj = {
+      const fixedContent = {
+        id: this.data.id,
         title: `${target[0].value}${target[1].name}${target[1].value}`,
+        order: this.data.order,
       };
-
-      await this.fixTodo(this.data.id, this.data.order, obj);
-      this.$emit("refreshList");
-      this.$emit("update:modelValue", false);
+      this.$store.dispatch("todo/fixTodo", fixedContent);
       e.target[0].value = "";
-    },
-    async fixTodo(id, order, title) {
-      await axios({
-        url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
-        method: "put",
-        headers: {
-          "content-type": "application/json",
-          apikey: "FcKdtJs202110",
-          username: this.user,
-        },
-        data: {
-          ...title,
-          done: false,
-          order: order,
-        },
-      });
+      this.$emit("update:modelValue", false);
     },
     closing() {
-      this.$refs.ftitle.value = "";
+      this.$refs.fixtitle.value = "";
       this.$emit("update:modelValue", false);
     },
   },
@@ -172,8 +147,10 @@ form {
   .modi-info {
     position: absolute;
     width: 100%;
-    bottom: -12px;
-    left: 3.3em;
+    top: 1.4em;
+    left: 9em;
+    font-size: 0.8em;
+    color: rgba(#efefef, 0.9);
   }
   .close {
     position: absolute;
