@@ -20,7 +20,7 @@ export default {
       } 
       return orders + 1
     },
-    doneMaxOrder(state) {
+    doneMaxOrder(state, getters) {
       let orders = Math.max(...getters.doneList.map((item) => item.order));
       if (orders < 0) {
         orders = 3000
@@ -104,6 +104,25 @@ export default {
         },
       });
       commit('changeTodoItem', data)
+    },
+    async returnTodo({ state, getters, commit }, todo) {
+      const { id, title } = todo
+      const { data } = await axios({
+        url: `https://asia-northeast3-heropy-api.cloudfunctions.net/api/todos/${id}`,
+        method: "put",
+        headers: {
+          "content-type": "application/json",
+          apikey: "FcKdtJs202110",
+          username: state.user,
+        },
+        data: {
+          title,
+          done: false,
+          order: getters.todoMaxOrder,
+        },
+      });
+      commit('addTodoItem', data)
+      commit('deleteTodoItem', id)
     },
     async fixTodo({ state, commit },fixInfo) {
       const { id, title, order } = fixInfo
