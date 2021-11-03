@@ -50,19 +50,24 @@ export default {
     },
   },
   methods: {
-    async done(e) {
+    done(e) {
       if (e.target.checked) {
         this.$store.dispatch("todo/doneTodo", this.item);
       }
     },
-    async del() {
+    del() {
       this.$store.dispatch("todo/deleteTodo", this.item.id);
     },
     openFixModal() {
       this.$emit("fixInfo", this.item);
     },
     changeToggle() {
-      this.change = !this.change;
+      if (!this.change) {
+        this.change = !this.change;
+        setTimeout(() => {
+          this.change = !this.change;
+        }, 2000);
+      }
     },
   },
 };
