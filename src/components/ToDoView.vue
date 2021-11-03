@@ -28,14 +28,16 @@ export default {
   },
   data() {
     return {
-      turn: true,
+      turn: false,
       throttling: true,
       content: "Done",
     };
   },
   async created() {
-    // 최초 서버 요청
     await this.$store.dispatch("todo/getTodos");
+    setTimeout(() => {
+      this.turn = true;
+    }, 300);
     setTimeout(() => {
       console.log("loading 표시를 기본으로 하고 1초뒤 없어지게");
     }, 1000);
