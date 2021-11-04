@@ -53,8 +53,9 @@ export default {
       idList.forEach( id => {
         const idx = state.allList.findIndex(todos => todos.id === id)
         ordered.push(state.allList[idx])
+        state.allList.splice(idx, 1)
       })
-      state.allList = ordered
+      state.allList.unshift(...ordered)
     },
   },
   actions: {
