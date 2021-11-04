@@ -12,10 +12,10 @@ import { makeListItem } from './makeListItem'
 
 // action2 결과가 있을 경우 결과 페이지를 초기화
 // additional 로딩 스피너를 보여주기 위해 1초 강제 대기(요구사항 편하게 확인 하기 위함)
-// action3 결과를 보여주고 이벤트 핸들러를 통한 touchEnd 함수를 콜백하도록 설정
+// action3 결과를 보여주고 이벤트 핸들러를 통한 handleScroll 함수를 콜백하도록 설정
 
-  // touchEnd 쓰로틀링을 적용한 페이지당 영화 정보 reload 함수 
-  // exception3 추가 정보가 없을 경우 => touchEnd 함수를 종료
+  // handleScroll 쓰로틀링을 적용한 페이지당 영화 정보 reload 함수 
+  // exception3 추가 정보가 없을 경우 => handleScroll 함수를 종료
 export async function searchStart (event, formEl, resultCT, modalWindow) {
   event.preventDefault()
   document.body.onscroll = ''
@@ -23,7 +23,6 @@ export async function searchStart (event, formEl, resultCT, modalWindow) {
   if (!keyword) return
 
   const spinner = resultCT.querySelector('.spinner')
-  const ulEl = resultCT.querySelector('.list')
   let page = 1
   let getAdditional = true
   const data = await getData(keyword, page)
@@ -31,15 +30,16 @@ export async function searchStart (event, formEl, resultCT, modalWindow) {
   if (!data.maxPage || !data.list) {
     noMovieInfo(formEl, resultCT)
   } else {
-    initResult(resultCT, ulEl, spinner)
+    initResult(resultCT)
+    spinner.classList.remove('none')
     setTimeout(()=> {
-      makeListItem(data.list, ulEl, modalWindow)
-      document.body.onscroll = touchEnd
+      makeListItem(data.list, resultCT, modalWindow)
+      document.body.onscroll = handleScroll
       spinner.classList.add('none')
     },1000)
   }
   
-  async function touchEnd () {
+  async function handleScroll () {
     if (window.scrollY + window.innerHeight > document.body.clientHeight - 100) {
       if (!getAdditional) {
         return
@@ -50,7 +50,7 @@ export async function searchStart (event, formEl, resultCT, modalWindow) {
         if(!data.maxPage || !data.list){
           return
         }
-        makeListItem(data.list, ulEl, modalWindow)
+        makeListItem(data.list, resultCT, modalWindow)
       }
     }
     getAdditional = true

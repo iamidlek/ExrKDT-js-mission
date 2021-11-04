@@ -4,6 +4,14 @@ import axios from 'axios'
 // return 전체 영화 수, 10개의 영화 정보(1페이지에 해당)
 export async function getData (keyword, page) {
   const info = { keyword, page }
-  const { data } = await axios.post('/.netlify/functions/list', info)
+  const { data } = await axios.get('/.netlify/functions/list', {params:info})
   return { maxPage: data.totalResults, list: data.Search }
 }
+
+// post
+
+// export async function getData (keyword, page) {
+//   const info = { keyword, page }
+//   const { data } = await axios.post('/.netlify/functions/list', info)
+//   return { maxPage: data.totalResults, list: data.Search }
+// }
