@@ -1,9 +1,9 @@
 <template>
-  <div class="book">
+  <div class="donebox">
     <i class="leaf">
       <h3><span>D</span>one List</h3>
     </i>
-    <div class="removall" @click="clear"><div></div></div>
+    <button type="button" class="removall" @click="clear"><div></div></button>
     <ul class="list">
       <div class="nolist" v-if="!doneList.length">계획을 실행하세요 !</div>
       <li v-else v-for="item in doneList" :key="item.id" class="contentbox">
@@ -11,7 +11,7 @@
           <span>{{ item.updatedAt.substr(5, 5) }}</span>
           <span>{{ item.title.split("__@dateSet-expire__Info:")[0] }}</span>
         </div>
-        <div class="del" @click.capture="die" :data-id="item.id">
+        <div class="del" @click.capture="donebox" :data-id="item.id">
           <div class="cross1"></div>
           <div class="cross2"></div>
         </div>
@@ -39,7 +39,7 @@ export default {
     },
   },
   methods: {
-    die(e) {
+    donebox(e) {
       this.$store.dispatch("todo/deleteTodo", e.target.dataset.id);
     },
     backTodo(e) {
@@ -59,7 +59,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.book {
+.donebox {
   width: 340px;
   height: 500px;
   display: flex;
@@ -121,12 +121,13 @@ export default {
     position: absolute;
     top: 1.66em;
     left: 1.2em;
-    width: 18px;
-    height: 24px;
+    width: 24px;
+    height: 28px;
     border: 2px solid rgba(255, 255, 255, 0.5);
     border-radius: 4px;
     font-size: 1.6em;
     color: rgba(255, 255, 255, 0.5);
+    background: transparent;
     text-align: center;
     line-height: 1.05;
     padding-right: 0.5px;

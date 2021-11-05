@@ -1,8 +1,8 @@
 <template>
   <form @submit.prevent="fixed">
-    <label for="fix-title" class="t">Fix Title</label>
+    <label for="title">Fix Title</label>
     <input
-      id="fix-title"
+      id="title"
       ref="fixtitle"
       type="text"
       name="title"
@@ -17,10 +17,10 @@
     <input
       id="resche"
       type="date"
-      :value="today"
+      :value="beforeDue"
       name="__@dateSet-expire__Info:"
     />
-    <button type="submit" class="fix">F i x</button>
+    <button type="submit" class="fix">Fix</button>
     <div class="close" @click="closing">
       <div class="cross1"></div>
       <div class="cross2"></div>
@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import dayjs from "dayjs";
+
 export default {
   props: {
     modelValue: {
@@ -41,14 +43,11 @@ export default {
   },
   emits: ["update:modelValue"],
   computed: {
-    today() {
-      const date = new Date();
-      const month =
-        date.getMonth() + 1 >= 10
-          ? date.getMonth() + 1
-          : "0" + (date.getMonth() + 1);
-      const day = date.getDate() >= 10 ? date.getDate() : "0" + date.getDate();
-      return date.getFullYear() + "-" + month + "-" + day;
+    beforeDue() {
+      const before = dayjs(
+        this.data.title.split("__@dateSet-expire__Info:")[1]
+      ).format("YYYY-MM-DD");
+      return before;
     },
     recentModify() {
       const updatted = this.data.updatedAt;
@@ -60,18 +59,22 @@ export default {
   },
   methods: {
     fixed(e) {
-      const { target } = e;
-      if (!target[0].value) {
-        target[0].placeholder = "입력이 필요합니다";
+      const title = e.target.title;
+      const dueDate = e.target.resche;
+      if (!title.value) {
+        title.placeholder = "입력이 필요합니다";
+        return;
+      }
+      if (title.value.length > 20) {
         return;
       }
       const fixedContent = {
         id: this.data.id,
-        title: `${target[0].value}${target[1].name}${target[1].value}`,
+        title: `${title.value}${dueDate.name}${dueDate.value}`,
         order: this.data.order,
       };
       this.$store.dispatch("todo/fixTodo", fixedContent);
-      e.target[0].value = "";
+      title.value = "";
       this.$emit("update:modelValue", false);
     },
     closing() {
@@ -110,7 +113,7 @@ form {
     outline: none;
     background: transparent;
     color: #efefef;
-    &#fix-title {
+    &#title {
       caret-color: transparent;
       width: 90%;
       margin: 10px -6px;
@@ -143,6 +146,7 @@ form {
     box-sizing: border-box;
     border: 2px solid rgba(#efefef, 0.9);
     cursor: pointer;
+    letter-spacing: 0.6rem;
   }
   .modi-info {
     position: absolute;

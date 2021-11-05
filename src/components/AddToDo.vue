@@ -7,9 +7,9 @@
       type="text"
       name="title"
       autocomplete="off"
-      :placeholder="placeHolder"
+      :placeholder="placeholderText"
       onfocus="placeholder = ''"
-      :onblur="`placeholder = '${placeHolder}'`"
+      :onblur="`placeholder = '${placeholderText}'`"
       maxlength="20"
     />
     <label for="goal">Due Date</label>
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import dayjs from "dayjs";
 
 export default {
   props: {
@@ -39,32 +39,31 @@ export default {
   emits: ["update:modelValue"],
   data() {
     return {
-      placeHolder: "Make To Do",
+      placeholderText: "Make To Do",
     };
   },
   computed: {
     today() {
-      const date = new Date();
-      const month =
-        date.getMonth() + 1 >= 10
-          ? date.getMonth() + 1
-          : "0" + (date.getMonth() + 1);
-      const day = date.getDate() >= 10 ? date.getDate() : "0" + date.getDate();
-      return date.getFullYear() + "-" + month + "-" + day;
+      const now = dayjs().format("YYYY-MM-DD");
+      return now;
     },
   },
   methods: {
     adding(e) {
-      const { target } = e;
-      if (!target[0].value) {
-        target[0].placeholder = "입력이 필요합니다";
+      const title = e.target.title;
+      const dueDate = e.target.goal;
+      if (!title.value) {
+        title.placeholder = "입력이 필요합니다";
         return;
       }
-      const Content = {
-        title: `${target[0].value}${target[1].name}${target[1].value}`,
+      if (title.value.length > 20) {
+        return;
+      }
+      const content = {
+        title: `${title.value}${dueDate.name}${dueDate.value}`,
       };
-      this.$store.dispatch("todo/createTodo", Content);
-      target[0].value = "";
+      this.$store.dispatch("todo/createTodo", content);
+      title.value = "";
       this.$emit("update:modelValue", false);
     },
     closing() {
