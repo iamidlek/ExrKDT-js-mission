@@ -38,15 +38,12 @@ export default {
     setTimeout(() => {
       this.turn = true;
     }, 300);
-    setTimeout(() => {
-      console.log("loading 표시를 기본으로 하고 1초뒤 없어지게");
-    }, 1000);
   },
   methods: {
     turnning() {
       if (this.throttling) {
         this.throttling = false;
-        this.turn ? (this.content = "ToDo") : (this.content = "Done");
+        this.content = this.turn ? "ToDo" : "Done";
         this.turn = !this.turn;
         setTimeout(() => (this.throttling = true), 800);
       }

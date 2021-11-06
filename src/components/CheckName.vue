@@ -1,9 +1,14 @@
 <template>
   <div class="wrapper">
     <h1>TooD</h1>
-    <form v-if="!user" class="form" @submit.prevent="recive">
+    <div v-if="user" class="greet">
+      <p>반갑습니다</p>
+      <p>{{ user }} 님</p>
+    </div>
+    <form v-else class="form" @submit.prevent="receive">
       <p>이름을 입력해 주세요</p>
       <input
+        id="userName"
         type="text"
         v-model="inputVal"
         autocomplete="off"
@@ -13,10 +18,6 @@
       />
       <button type="submit" class="enter">Enter</button>
     </form>
-    <div v-else class="greet">
-      <p>반갑습니다</p>
-      <p>{{ user }} 님</p>
-    </div>
   </div>
 </template>
 
@@ -40,19 +41,25 @@ export default {
     },
   },
   methods: {
-    recive(e) {
-      const user = e.target[0].value;
+    receive(e) {
+      const user = this.inputVal.trim();
       if (user === "") {
         this.placeHolder = "영문 이름을 입력하세요";
-      } else if (!/[a-zA-Z]/g.test(user)) {
-        this.placeHolder = "영문 입력만 가능합니다";
-      } else if (/\s/g.test(user)) {
-        this.placeHolder = "공백을 제거해 주세요";
-      } else {
-        localStorage.setItem("todo", user);
-        this.$store.commit("todo/checkUser");
-        this.$emit("signIn");
+        return;
       }
+      if (!/[a-zA-Z]/g.test(user)) {
+        this.placeHolder = "영문 입력만 가능합니다";
+        return;
+      }
+      if (/\s/g.test(user)) {
+        this.placeHolder = "공백을 제거해 주세요";
+        return;
+      }
+
+      localStorage.setItem("todoUser", user);
+      this.$store.commit("todo/checkUser");
+      this.$emit("signIn");
+
       this.inputVal = "";
     },
   },

@@ -1,5 +1,5 @@
 <template>
-  <div class="book">
+  <div class="todobox">
     <i class="leaf">
       <h3><span>T</span>o Do List</h3>
     </i>
@@ -59,7 +59,7 @@ export default {
         return this.$store.getters["todo/todoList"];
       },
       set(val) {
-        const idList = val.map((item) => item.id);
+        const idList = val.map(({ id }) => id);
         this.$store.dispatch("todo/lineUp", idList);
       },
     },
@@ -91,7 +91,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.book {
+.todobox {
   width: 340px;
   height: 500px;
   display: flex;

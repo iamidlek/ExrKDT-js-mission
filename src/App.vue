@@ -2,20 +2,25 @@
   <BackGround />
   <transition name="fade">
     <div v-if="effect === 'init'"></div>
-    <CheckName v-else-if="effect === 'check'" @sign-in="effect = 'signed'" />
+    <CheckName v-else-if="effect === 'check'" @sign-in="checkDone" />
     <ToDoView v-else />
+  </transition>
+  <transition name="fade">
+    <Loading v-if="effect === 'signed'" @loaded="effect = 'active'" />
   </transition>
 </template> 
 
 <script>
 import BackGround from "~/components/BackGround";
 import CheckName from "~/components/CheckName";
+import Loading from "~/components/Loading";
 import ToDoView from "~/components/ToDoView";
 
 export default {
   components: {
     BackGround,
     CheckName,
+    Loading,
     ToDoView,
   },
   data() {
@@ -31,6 +36,13 @@ export default {
   mounted() {
     setTimeout(() => (this.effect = "check"), 700);
     this.$store.commit("todo/checkUser");
+  },
+  methods: {
+    checkDone() {
+      setTimeout(() => {
+        this.effect = "signed";
+      }, 1000);
+    },
   },
 };
 </script>

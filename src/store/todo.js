@@ -30,7 +30,7 @@ export default {
   },
   mutations: {
     checkUser(state) {
-      state.user = localStorage.getItem("todo")
+      state.user = localStorage.getItem("todoUser")
     },
     assignState(state, payload) {
       Object.keys(payload).forEach(key => {
@@ -42,7 +42,9 @@ export default {
     },
     changeTodoItem(state, todo) {
       const idx = state.allList.findIndex(todos => todos.id === todo.id)
-      state.allList[idx] = todo
+      if (idx < 0) {
+        state.allList[idx] = todo
+      }
     },
     deleteTodoItem(state, id) {
       const idx = state.allList.findIndex(todos => todos.id === id)
@@ -53,8 +55,9 @@ export default {
       idList.forEach( id => {
         const idx = state.allList.findIndex(todos => todos.id === id)
         ordered.push(state.allList[idx])
+        state.allList.splice(idx, 1)
       })
-      state.allList = ordered
+      state.allList.unshift(...ordered)
     },
   },
   actions: {
