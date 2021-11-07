@@ -42,9 +42,8 @@ export default {
     },
     changeTodoItem(state, todo) {
       const idx = state.allList.findIndex(todos => todos.id === todo.id)
-      if (idx < 0) {
-        state.allList[idx] = todo
-      }
+      if (idx === -1) return
+      state.allList[idx] = todo
     },
     deleteTodoItem(state, id) {
       const idx = state.allList.findIndex(todos => todos.id === id)
