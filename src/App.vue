@@ -1,26 +1,25 @@
 <template>
   <div>
-    init
+    list 
   </div>
 </template>
-<script>
-// import axios from 'axios'
-// import { createItem } from '~/api/axiosPost'
-import { getTree } from '~/api/axiosGet'
 
+<script>
 export default {
   components: {
   },
   data() {
     return {
+      
     } 
   },
+  computed: {
+  },
   async created() {
-    console.log(await getTree())
-    // await createItem('3FoGSg1ZXwdcX2XhERDW', '자식 1뎁스', '내용도 그냥저냥')
+    await this.$store.dispatch('workspace/getWorkspaceTree')
+    console.log(this.$store.state.workspace.workspaceTree)
   },
   mounted() {
-  //   setTimeout(()=>{console.log(data)},2000)
   }
 }
 </script>

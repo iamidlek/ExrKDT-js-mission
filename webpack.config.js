@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
+const DotenvWebpack = require('dotenv-webpack')
 
 module.exports = (env, options) => {
   console.log(env,options)
@@ -55,6 +56,7 @@ module.exports = (env, options) => {
         ]
       }),
       new VueLoaderPlugin(),
+      new DotenvWebpack(),
       new webpack.DefinePlugin({
         __VUE_OPTIONS_API__: true,
         __VUE_PROD_DEVTOOLS__: false,
