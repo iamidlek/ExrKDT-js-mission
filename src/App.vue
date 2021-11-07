@@ -1,15 +1,18 @@
 <template>
-  <div @click="sample = 'man'">
+  <div>
     init
   </div>
 </template>
 <script>
+
 export default {
+  components: {
+  },
   data() {
     return {
-      sample: 'name',
-      sample2: 'done',
     } 
+  },
+  created() {
   },
 }
 </script>

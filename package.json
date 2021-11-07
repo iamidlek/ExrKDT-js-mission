@@ -31,6 +31,7 @@
     "babel-loader": "^8.2.3",
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.5.1",
+    "dotenv-webpack": "^7.0.3",
     "eslint": "^8.2.0",
     "eslint-plugin-vue": "^8.0.3",
     "html-webpack-plugin": "^5.5.0",
@@ -46,6 +47,9 @@
     "webpack-dev-server": "^4.4.0"
   },
   "dependencies": {
-    "vue": "^3.2.21"
+    "axios": "^0.24.0",
+    "vue": "^3.2.21",
+    "vuedraggable": "^4.1.0",
+    "vuex": "^4.0.2"
   }
 }
