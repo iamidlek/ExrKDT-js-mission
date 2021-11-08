@@ -4,7 +4,8 @@ export default {
   namespaced: true,
   state: () => ({
     workspaceTree: [],
-    workSpaceDetail: ''
+    workSpaceDetail: '',
+    workSpacePath: []
   }),
   getters: {
   },
@@ -14,9 +15,6 @@ export default {
         state[key] = payload[key]
       })
     },
-    setDetail(state, payload) {
-      state.workSpaceDetail = payload
-    }
   },
   actions: {
     async getWorkspaceTree ({ commit }) {
@@ -24,8 +22,27 @@ export default {
       commit('assignState', { workspaceTree })
     },
     async getWorkspaceDetail({ commit }, id) {
-      const { data } = await axios.get(`/${id}`)
-      commit('setDetail', data)
+      const { data : workSpaceDetail} = await axios.get(`/${id}`)
+      commit('assignState', { workSpaceDetail })
+    },
+    setPath({ commit }, path) {
+      commit('assignState', { workSpacePath : path })
+    },
+    async createWorkspace({ dispatch }, parentId) {
+      const data = { parentId, title: '', content: ''}
+      const { data: info } = await axios.post('', data)
+      dispatch('getWorkspaceTree')
+      dispatch('setPath', [])
+      return info.id
+    },
+    async editWorkspace({ dispatch }, obj){
+      await axios.put(`/${obj.id}`, obj.data)
+      dispatch('getWorkspaceTree')
+    },
+    async deleteWorkspace({ dispatch }, id) {
+      await axios.delete(`/${id}`)
+      dispatch('getWorkspaceTree')
+      dispatch('setPath', [])
     }
   }
 }
