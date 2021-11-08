@@ -63,6 +63,7 @@ module.exports = (env, options) => {
       })
     ],
     devServer: {
+      historyApiFallback: true,
       port: 8083,
       open: true,
     }
