@@ -1,7 +1,10 @@
 <template>
   <div class="wrapper">
     <div class="bar">
-      <WorkSpaceBar />
+      <WorkSpaceBar v-if="isLoad" />
+      <LoadingBox
+        v-else
+        @loaded="isLoad =true" />
       <div class="handle"></div>
     </div>
     <div class="size-controler"></div>
@@ -14,22 +17,23 @@
 <script>
 import WorkSpaceBar from '~/components/WorkSpaceBar'
 import WorkSpaceContent from '~/components/WorkSpaceContent'
+import LoadingBox from '~/components/LoadingBox'
+
 
 export default {
   components: {
     WorkSpaceBar,
-    WorkSpaceContent
+    WorkSpaceContent,
+    LoadingBox
   },
-  computed: {
+  data() {
+    return {
+      isLoad: false
+    }
   },
   async created() {
     await this.$store.dispatch('workspace/getWorkspaceTree')
   },
-  mounted() {
-    // 오류 확인용
-    const { apikey } = process.env
-    console.log(apikey)
-  }
 }
 </script>
 
@@ -55,10 +59,9 @@ export default {
       width: 6px;
       height: 100%;
       opacity: .7;
-      &:hover {
+      // &:hover {
         // background-color: yellowgreen;
-
-      }
+      // }
     }
   }
   .main-content {

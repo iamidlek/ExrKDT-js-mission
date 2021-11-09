@@ -4,6 +4,31 @@
       src="https://avatars.githubusercontent.com/u/75520260?v=4"
       alt="logo" />
     <h1>YooHyungChul</h1>
+    <div
+      ref="auth"
+      class="auth"
+      @click="check">
+      Auth
+    </div>
+    <div
+      v-if="modal"
+      class="sign-modal">
+      <form @submit.prevent="receive">
+        <p>ID</p>
+        <input
+          id="id"
+          type="text"
+          autocomplete="off" />
+        <p>PW</p>
+        <input
+          id="pass"
+          type="password"
+          autocomplete="off" />
+        <button type="submit">
+          Enter
+        </button>
+      </form>
+    </div>
   </div>
   <div class="tree">
     <NestedTree
@@ -25,6 +50,11 @@ export default {
   components: {
     NestedTree
   },
+  data() {
+    return {
+      modal: false
+    }
+  },
   computed: {
     workspaceTree () {
       return this.$store.state.workspace.workspaceTree
@@ -34,6 +64,25 @@ export default {
     async createWS() {
       const info = await this.$store.dispatch('workspace/createWorkspace')
       this.$router.push(`/${info}`)
+    },
+    check(e) {
+      if (e.target.classList.contains('checked')) return
+      this.modal = !this.modal
+    },
+    receive(e) {
+      const idVal = e.target.id.value
+      const pwVal = e.target.pass.value
+      const { id } = process.env
+      const { pass } = process.env
+
+      if (idVal === id && pwVal === pass) {
+        this.$refs.auth.classList.add('checked')
+        this.modal = false
+        this.$store.commit('workspace/authCheck')
+      } else {
+        e.target.id.value = ''
+        e.target.pass.value = ''
+      }
     }
   }
 }
@@ -46,6 +95,7 @@ export default {
   justify-content: flex-start;
   align-items: center;
   margin-bottom: 1rem;
+  position: relative;
   img {
     width: 24px;
     height: 24px;
@@ -53,6 +103,53 @@ export default {
   }
   h1 {
     font-size: 1rem;
+  }
+  .auth {
+    font-size: 0.8rem;
+    border: 2px solid rgb(218, 54, 32);
+    width: 40px;
+    height: 1.2rem;
+    text-align: center;
+    border-radius: 20px;
+    padding-right: 1px;
+    position: absolute;
+    top: 0.8rem;
+    right: 1.4rem;
+    cursor: pointer;
+    &:hover {
+      background: rgba(218, 54, 32, 0.2);
+    }
+    &.checked {
+      border: 2px solid rgb(32, 218, 57);
+      background: rgba(32, 218, 57, 0.1);
+    }
+  }
+  .sign-modal {
+    position: absolute;
+    top: 0.4rem;
+    left: 19.2rem;
+    background: #373c3f;
+    border-radius: 10px;
+    text-align: center;
+    width: 10rem;
+    p {
+      position: absolute;
+      margin: 0;
+    }
+    input {
+      display: block;
+      margin: 7px auto;
+      width: 6rem;
+      background: rgba(255,255,255,0.8);
+      outline: none;
+      border: none;
+    }
+    button {
+      border-radius: 10px;
+      background: transparent;
+      border: 2px solid rgb(32, 218, 57);
+      color: rgba(255,255,255,0.8);;
+    }
   }
 }
 .tree {

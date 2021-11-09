@@ -5,7 +5,8 @@ export default {
   state: () => ({
     workspaceTree: [],
     workSpaceDetail: '',
-    workSpacePath: []
+    workSpacePath: [],
+    authority: false
   }),
   getters: {
   },
@@ -15,6 +16,9 @@ export default {
         state[key] = payload[key]
       })
     },
+    authCheck(state) {
+      state.authority = true
+    }
   },
   actions: {
     async getWorkspaceTree ({ commit }) {

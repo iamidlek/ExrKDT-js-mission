@@ -13,7 +13,9 @@
         @click="viewChild">></span>
       {{ workspace.title }}
       <div class="tools">
-        <div @click="deleteWS">
+        <div
+          v-if="auth"
+          @click="deleteWS">
           x
         </div>
         <div
@@ -49,6 +51,11 @@ export default {
       required: true,
       type: Object,
       default: () => ({})
+    }
+  },
+  computed: {
+    auth() {
+      return this.$store.state.workspace.authority
     }
   },
   methods: {
