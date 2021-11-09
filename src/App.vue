@@ -20,17 +20,15 @@ export default {
     WorkSpaceBar,
     WorkSpaceContent
   },
-  data() {
-    return {
-      
-    } 
-  },
   computed: {
   },
   async created() {
     await this.$store.dispatch('workspace/getWorkspaceTree')
   },
   mounted() {
+    // 오류 확인용
+    const { apikey } = process.env
+    console.log(apikey)
   }
 }
 </script>
