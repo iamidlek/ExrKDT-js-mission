@@ -56,7 +56,7 @@ export default {
       height: 100%;
       opacity: .7;
       &:hover {
-        background-color: yellowgreen;
+        // background-color: yellowgreen;
 
       }
     }
